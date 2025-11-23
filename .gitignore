@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# R / RStudio
+.Rproj.user/
+.Rhistory
+.RData
+
+# Data
+data/
+*.zip
+*.tar.gz
+amazon_product_data_corpus_mixed_topics_per_author_reformatted*/
