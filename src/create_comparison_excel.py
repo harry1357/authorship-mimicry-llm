@@ -100,14 +100,14 @@ def create_long_comparison_sheet(k: int = 100) -> pd.DataFrame:
     return df_long
 
 
-def create_summary_sheet() -> pd.DataFrame:
+def create_summary_sheet(k: int = 100) -> pd.DataFrame:
     """
     Create a summary statistics sheet showing per-model statistics.
     """
     rows = []
     
     for model_key in MODEL_CONFIGS.keys():
-        df = load_top_k(model_key, k=100)
+        df = load_top_k(model_key, k=k)
         
         rows.append({
             "model": model_key,
@@ -124,16 +124,16 @@ def create_summary_sheet() -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def create_overlap_matrix() -> pd.DataFrame:
+def create_overlap_matrix(k: int = 100) -> pd.DataFrame:
     """
-    Create a matrix showing how many authors overlap between each pair of models' top-100.
+    Create a matrix showing how many authors overlap between each pair of models' top-K.
     """
     model_keys = list(MODEL_CONFIGS.keys())
     matrix = pd.DataFrame(index=model_keys, columns=model_keys, dtype=int)
     
     author_sets = {}
     for model_key in model_keys:
-        df = load_top_k(model_key, k=100)
+        df = load_top_k(model_key, k=k)
         author_sets[model_key] = set(df["author_id"])
     
     for mk1 in model_keys:
@@ -144,11 +144,11 @@ def create_overlap_matrix() -> pd.DataFrame:
     return matrix
 
 
-def create_consensus_sheet(min_models: int = 4) -> pd.DataFrame:
+def create_consensus_sheet(min_models: int = 4, k: int = 100) -> pd.DataFrame:
     """
     Create a sheet with only authors appearing in at least min_models.
     """
-    df_wide = create_wide_comparison_sheet(k=100)
+    df_wide = create_wide_comparison_sheet(k=k)
     df_consensus = df_wide[df_wide["num_models"] >= min_models].copy()
     
     return df_consensus
@@ -156,7 +156,7 @@ def create_consensus_sheet(min_models: int = 4) -> pd.DataFrame:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Create comprehensive Excel workbook comparing all 6 models' top-100 consistency rankings."
+        description="Create comprehensive Excel workbook comparing all 6 models' consistency rankings."
     )
     parser.add_argument(
         "--output",
@@ -170,6 +170,12 @@ def main():
         default=4,
         help="Minimum models for consensus sheet (default: 4)"
     )
+    parser.add_argument(
+        "--rank_threshold",
+        type=int,
+        default=100,
+        help="Top-K threshold to use from each model's CSV (default: 100, use all rows in file)"
+    )
     
     args = parser.parse_args()
     output_path = CONSISTENCY_DIR / args.output
@@ -177,35 +183,36 @@ def main():
     print("=" * 80)
     print("CREATING COMPREHENSIVE COMPARISON EXCEL WORKBOOK")
     print("=" * 80)
+    print(f"Using top-{args.rank_threshold} authors from each model")
     
     with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
         # Sheet 1: Wide format comparison (main sheet)
         print("\n[1/6] Creating 'All Authors (Wide)' sheet...")
-        df_wide = create_wide_comparison_sheet(k=100)
+        df_wide = create_wide_comparison_sheet(k=args.rank_threshold)
         df_wide.to_excel(writer, sheet_name="All Authors (Wide)", index=False)
         print(f"   ✓ Added {len(df_wide)} unique authors")
         
         # Sheet 2: Long format (for pivot tables)
         print("\n[2/6] Creating 'All Authors (Long)' sheet...")
-        df_long = create_long_comparison_sheet(k=100)
+        df_long = create_long_comparison_sheet(k=args.rank_threshold)
         df_long.to_excel(writer, sheet_name="All Authors (Long)", index=False)
         print(f"   ✓ Added {len(df_long)} rows (author-model pairs)")
         
         # Sheet 3: Summary statistics
         print("\n[3/6] Creating 'Model Summary' sheet...")
-        df_summary = create_summary_sheet()
+        df_summary = create_summary_sheet(k=args.rank_threshold)
         df_summary.to_excel(writer, sheet_name="Model Summary", index=False)
         print(f"   ✓ Added statistics for {len(df_summary)} models")
         
         # Sheet 4: Overlap matrix
         print("\n[4/6] Creating 'Overlap Matrix' sheet...")
-        df_overlap = create_overlap_matrix()
+        df_overlap = create_overlap_matrix(k=args.rank_threshold)
         df_overlap.to_excel(writer, sheet_name="Overlap Matrix")
         print(f"   ✓ Added {len(df_overlap)}x{len(df_overlap.columns)} overlap matrix")
         
         # Sheet 5: Consensus authors (appear in ≥4 models)
         print(f"\n[5/6] Creating 'Consensus (≥{args.min_consensus} models)' sheet...")
-        df_consensus = create_consensus_sheet(min_models=args.min_consensus)
+        df_consensus = create_consensus_sheet(min_models=args.min_consensus, k=args.rank_threshold)
         df_consensus.to_excel(writer, sheet_name=f"Consensus (≥{args.min_consensus} models)", index=False)
         print(f"   ✓ Added {len(df_consensus)} consensus authors")
         

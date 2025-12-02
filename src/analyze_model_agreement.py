@@ -23,7 +23,7 @@ def load_top_k(model_key: str, k: int = 100) -> pd.DataFrame:
     return df[df["rank"] <= k].copy()
 
 
-def compute_pairwise_rank_correlations():
+def compute_pairwise_rank_correlations(rank_threshold: int = 100):
     """
     Compute rank correlations between all pairs of models for their overlapping authors.
     
@@ -33,9 +33,9 @@ def compute_pairwise_rank_correlations():
     results = []
     
     for i, mk1 in enumerate(model_keys):
-        df1 = load_top_k(mk1, k=100)
+        df1 = load_top_k(mk1, k=rank_threshold)
         for mk2 in model_keys[i+1:]:
-            df2 = load_top_k(mk2, k=100)
+            df2 = load_top_k(mk2, k=rank_threshold)
             
             # Find overlapping authors
             overlap = set(df1["author_id"]).intersection(set(df2["author_id"]))
@@ -190,7 +190,7 @@ def main():
     
     # 1. Pairwise rank correlations
     print("\n[1/3] Computing pairwise rank correlations between models...")
-    df_corr = compute_pairwise_rank_correlations()
+    df_corr = compute_pairwise_rank_correlations(rank_threshold=args.rank_threshold)
     corr_path = args.output_dir / "model_rank_correlations.csv"
     df_corr.to_csv(corr_path, index=False)
     print(f"   Saved to: {corr_path}")
@@ -203,7 +203,7 @@ def main():
     
     # 2. Agreement by threshold analysis
     print("\n[2/3] Analyzing agreement across different K thresholds...")
-    df_agreement = analyze_agreement_by_threshold(max_k=100)
+    df_agreement = analyze_agreement_by_threshold(max_k=args.rank_threshold)
     agreement_path = args.output_dir / "agreement_by_threshold.csv"
     df_agreement.to_csv(agreement_path, index=False)
     print(f"   Saved to: {agreement_path}")
