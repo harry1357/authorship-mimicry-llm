@@ -1,0 +1,337 @@
+# src/build_generation_prompts.py
+
+from __future__ import annotations
+
+import argparse
+import ast
+import csv
+import json
+from pathlib import Path
+from typing import Dict, List, Any
+
+import numpy as np
+
+from generation_config import (
+    AUTHOR_LIST_FILE,
+    TOPICS_FILE,
+    CORPUS_DIR,
+    EMBEDDINGS_DIR,
+    PROMPTS_DIR,
+    REFERENCE_MODEL_KEY,
+    REFERENCE_CONSISTENCY_CSV,
+    DEFAULT_GEN_PARAMS,
+)
+
+
+def load_author_list() -> List[str]:
+    """
+    Load the 157 consensus authors from data/author_ids_consensus_157.txt.
+
+    The file has a header 'author_id' on the first line, followed by one
+    Amazon author ID per line, sorted by median rank.
+    """
+    ids: List[str] = []
+    with AUTHOR_LIST_FILE.open("r", encoding="utf-8") as f:
+        first = True
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            if first:
+                first = False
+                # Header row is literally 'author_id'
+                if line.lower() == "author_id":
+                    continue
+            ids.append(line)
+    return ids
+
+
+def load_topics() -> Dict[str, Dict[str, str]]:
+    """
+    Load topics for ALL authors from the root-level file.
+
+    Expected header (space- or tab-separated) like:
+      author_id training11 training12 training13 generation1
+                training21 training22 training23 generation2
+    """
+    topics: Dict[str, Dict[str, str]] = {}
+    with TOPICS_FILE.open("r", encoding="utf-8") as f:
+        header = None
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split()
+            if header is None:
+                header = parts
+                continue
+            author_id = parts[0]
+            row = dict(zip(header[1:], parts[1:]))
+            topics[author_id] = row
+    return topics
+
+
+def load_selected_indices() -> Dict[str, List[int]]:
+    """
+    Read LUAR consistency CSV and map author_id -> list of indices.
+
+    File: data/consistency/luar_crud_orig_top100.csv
+    Column: selected_indices, e.g. "[0, 5, 7, 10, 12, 22]"
+
+    Note: we just parse whatever is there; we will decide later
+    whether there are >=6 valid indices for a given author.
+    """
+    mapping: Dict[str, List[int]] = {}
+    with REFERENCE_CONSISTENCY_CSV.open("r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            author_id = row["author_id"]
+            raw = row.get("selected_indices", "").strip()
+            if not raw:
+                continue
+            try:
+                indices = ast.literal_eval(raw)
+            except Exception:
+                indices = [
+                    int(x)
+                    for x in raw.replace("[", "").replace("]", "").split(",")
+                    if x.strip()
+                ]
+            indices = [int(i) for i in indices]
+            if indices:
+                mapping[author_id] = indices
+    return mapping
+
+
+def read_review_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def build_prompt_text(
+    author_id: str,
+    training_reviews: List[Dict[str, Any]],
+    generation_topic: str,
+) -> str:
+    """
+    Build the actual text prompt we send to GPT-5.1.
+    """
+    lines: List[str] = []
+
+    lines.append(
+        "You are an expert at mimicking writing style while changing the topic."
+    )
+    lines.append(
+        f"Below are several example Amazon product reviews written by the SAME anonymous author (ID: {author_id})."
+    )
+    lines.append(
+        "Your task is to write a NEW product review in the same writing style "
+        "(sentence rhythm, vocabulary, level of detail, tone), "
+        f"but about a product in the following category: {generation_topic}."
+    )
+    lines.append("")
+    lines.append("Constraints:")
+    lines.append("1. Do not copy any specific sentences or phrases from the examples.")
+    lines.append("2. Write around 600–900 words.")
+    lines.append(
+        "3. Write a single coherent review with natural structure "
+        "(introduction, details, evaluation, conclusion)."
+    )
+    lines.append(
+        "4. Do not mention that you are an AI model or that you are imitating anyone."
+    )
+    lines.append("")
+    lines.append("==== EXAMPLE REVIEWS START ====")
+    lines.append("")
+
+    for i, rev in enumerate(training_reviews, start=1):
+        lines.append(
+            f"### Example review {i} (Category: {rev.get('category', 'Unknown')})"
+        )
+        lines.append(rev["text"].strip())
+        lines.append("")
+
+    lines.append("==== EXAMPLE REVIEWS END ====")
+    lines.append("")
+    lines.append("Now write the new review.")
+
+    return "\n".join(lines)
+
+
+def build_prompts_for_full_run(full_run: int) -> Path:
+    """
+    full_run = 1 or 2.
+
+    For each consensus author:
+      - Try to use the 6 LUAR-selected indices if available and valid.
+      - If not available or <6 or out-of-range, fall back to the first 6 files
+        in the LUAR npz 'files' array (deterministic).
+      - Split into two groups of 3 (first 3, last 3).
+      - Group 1 uses generation1 topic, group 2 uses generation2 topic.
+      - Build two prompts (prompt_index = 1, 2).
+      - Save them to a JSONL file for this full_run.
+    """
+    author_ids = load_author_list()
+    topics = load_topics()
+    selected_idx_map = load_selected_indices()
+
+    output_path = PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    count = 0
+
+    with output_path.open("w", encoding="utf-8") as out_f:
+        for author_id in author_ids:
+            topic_row = topics.get(author_id)
+            if not topic_row:
+                print(f"[build_prompts] WARNING: no topics row for {author_id}, skipping.")
+                continue
+
+            g1 = topic_row.get("generation1") or "HomeandKitchen"
+            g2 = topic_row.get("generation2") or "MoviesandTV"
+
+            npz_path = EMBEDDINGS_DIR / REFERENCE_MODEL_KEY / f"{author_id}.npz"
+            if not npz_path.exists():
+                print(f"[build_prompts] WARNING: missing embeddings npz for {author_id}, skipping.")
+                continue
+
+            data = np.load(npz_path, allow_pickle=True)
+            files_arr = data["files"]
+
+            if len(files_arr) < 6:
+                print(
+                    f"[build_prompts] WARNING: author {author_id} has only {len(files_arr)} files, "
+                    "need at least 6; skipping."
+                )
+                continue
+
+            # Preferred: LUAR-selected indices if we have >=6 valid ones
+            idx_list = selected_idx_map.get(author_id, [])
+            use_luar_indices = False
+            idx_sorted: List[int] = []
+
+            if idx_list and len(idx_list) >= 6:
+                idx_sorted = sorted(idx_list)[:6]
+                if max(idx_sorted) < len(files_arr) and min(idx_sorted) >= 0:
+                    use_luar_indices = True
+                else:
+                    print(
+                        f"[build_prompts] WARNING: LUAR indices out of range for {author_id}, "
+                        "falling back to first 6 files."
+                    )
+
+            if use_luar_indices:
+                selected_paths: List[Path] = []
+                for i in idx_sorted:
+                    raw_path = files_arr[i]
+                    raw_path_str = str(raw_path)
+                    p = Path(raw_path_str)
+                    if not p.is_absolute():
+                        p = CORPUS_DIR / p
+                    selected_paths.append(p)
+                selected_source = "luar_selected_indices"
+            else:
+                # Fallback: first 6 files in files_arr
+                idx_sorted = list(range(6))
+                selected_paths = []
+                for i in idx_sorted:
+                    raw_path = files_arr[i]
+                    raw_path_str = str(raw_path)
+                    p = Path(raw_path_str)
+                    if not p.is_absolute():
+                        p = CORPUS_DIR / p
+                    selected_paths.append(p)
+                selected_source = "fallback_first6"
+                print(
+                    f"[build_prompts] INFO: using fallback first-6 files for {author_id} "
+                    f"(no valid selected_indices)."
+                )
+
+            # First 3 vs last 3 for the two prompts
+            group1_paths = selected_paths[:3]
+            group2_paths = selected_paths[3:6]
+
+            def make_training_reviews(paths: List[Path]) -> List[Dict[str, Any]]:
+                trs: List[Dict[str, Any]] = []
+                for p in paths:
+                    try:
+                        text = read_review_text(p)
+                    except FileNotFoundError:
+                        print(f"[build_prompts] WARNING: file not found {p}, skipping author {author_id}.")
+                        return []
+                    stem = p.stem
+                    if "_" in stem:
+                        category = stem.split("_", 1)[1]
+                    else:
+                        category = "Unknown"
+                    trs.append(
+                        {
+                            "path": str(p),
+                            "text": text,
+                            "category": category,
+                        }
+                    )
+                return trs
+
+            training_group1 = make_training_reviews(group1_paths)
+            training_group2 = make_training_reviews(group2_paths)
+
+            if not training_group1 or not training_group2:
+                continue
+
+            configs = [
+                (1, training_group1, g1),
+                (2, training_group2, g2),
+            ]
+
+            for prompt_index, training_reviews, generation_topic in configs:
+                prompt_text = build_prompt_text(
+                    author_id=author_id,
+                    training_reviews=training_reviews,
+                    generation_topic=generation_topic,
+                )
+
+                seed = full_run * 100 + prompt_index  # e.g. 101, 102, 201, 202
+
+                record: Dict[str, Any] = {
+                    "prompt_id": f"{author_id}_run{full_run}_p{prompt_index}",
+                    "author_id": author_id,
+                    "full_run": full_run,
+                    "prompt_index": prompt_index,
+                    "generation_topic": generation_topic,
+                    "training_reviews": training_reviews,
+                    "prompt_text": prompt_text,
+                    "max_tokens": DEFAULT_GEN_PARAMS.max_tokens,
+                    "temperature": DEFAULT_GEN_PARAMS.temperature,
+                    "seed": seed,
+                    "metadata": {
+                        "topics_row": topic_row,
+                        "selected_indices": idx_sorted,
+                        "selected_source": selected_source,
+                        "group": f"G{prompt_index}",
+                    },
+                }
+
+                out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
+                count += 1
+
+    print(
+        f"[build_prompts] Wrote {count} prompts for full_run={full_run} to {output_path}"
+    )
+    return output_path
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--full-run",
+        type=int,
+        choices=[1, 2],
+        default=1,
+        help="Which full run to build prompts for (1 or 2).",
+    )
+    args = parser.parse_args()
+    build_prompts_for_full_run(args.full_run)
+
+
+if __name__ == "__main__":
+    main()
