@@ -1,4 +1,14 @@
 # src/export_generated_texts.py
+"""
+Generated Text Export Module
+
+This module provides functionality for extracting and organizing generated texts from
+the raw LLM output files. It processes JSONL generation records, extracts the generated
+text content, and exports it in a structured format suitable for stylometric analysis.
+
+The export process organizes texts by author and generation topic, facilitating
+systematic comparison between genuine author texts and LLM-generated mimicry attempts.
+"""
 
 from __future__ import annotations
 
@@ -11,10 +21,28 @@ from generation_config import GENERATED_DIR, PROMPTS_DIR
 
 
 def extract_text(record: Dict[str, Any]) -> str:
+    """
+    Extract generated text from a generation record.
+    
+    This function handles various record formats and nested structures that may
+    appear in the LLM API responses, providing robust text extraction across
+    different API versions and response formats.
+    
+    Args:
+        record: Dictionary containing the generation record
+        
+    Returns:
+        The generated text string
+        
+    Raises:
+        KeyError: If no recognized text field is found in the record
+    """
+    # Check for direct text fields in the record
     for key in ["generated_text", "output_text", "text"]:
         if key in record:
             return record[key]
 
+    # Check for text fields within a nested response object
     resp = record.get("response")
     if isinstance(resp, Dict):
         for key in ["generated_text", "output_text", "text"]:
@@ -25,6 +53,16 @@ def extract_text(record: Dict[str, Any]) -> str:
 
 
 def get_prompts_path(full_run: int, prompt_variant: str) -> Path:
+    """
+    Determine the file path for generation prompts.
+    
+    Args:
+        full_run: Experimental run identifier
+        prompt_variant: Prompt complexity type ("simple" or "complex")
+        
+    Returns:
+        Path to the prompts JSONL file
+    """
     if prompt_variant == "complex":
         return PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
     else:
@@ -32,6 +70,17 @@ def get_prompts_path(full_run: int, prompt_variant: str) -> Path:
 
 
 def get_generations_path(llm_key: str, full_run: int, prompt_variant: str) -> Path:
+    """
+    Determine the file path for generated texts.
+    
+    Args:
+        llm_key: LLM model identifier
+        full_run: Experimental run identifier
+        prompt_variant: Prompt complexity type
+        
+    Returns:
+        Path to the generations JSONL file
+    """
     if prompt_variant == "complex":
         return GENERATED_DIR / llm_key / f"generations_fullrun{full_run}.jsonl"
     else:
@@ -39,6 +88,22 @@ def get_generations_path(llm_key: str, full_run: int, prompt_variant: str) -> Pa
 
 
 def load_prompt_topics(full_run: int, prompt_variant: str) -> Dict[str, str]:
+    """
+    Load the mapping of prompt IDs to generation topics.
+    
+    This mapping is used to organize exported texts by their target generation topic,
+    enabling topic-specific analysis and comparison.
+    
+    Args:
+        full_run: Experimental run identifier
+        prompt_variant: Prompt complexity type
+        
+    Returns:
+        Dictionary mapping prompt IDs to topic names
+        
+    Raises:
+        FileNotFoundError: If the prompts file does not exist
+    """
     path = get_prompts_path(full_run, prompt_variant)
     if not path.exists():
         raise FileNotFoundError(f"Prompts file not found: {path}")

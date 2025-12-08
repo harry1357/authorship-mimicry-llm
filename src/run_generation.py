@@ -1,4 +1,14 @@
 # src/run_generation.py
+"""
+Text Generation Orchestration Module
+
+This module coordinates the text generation process for the authorship mimicry
+research project. It loads generation prompts, interfaces with LLM clients,
+and persists generated outputs in a structured format for subsequent analysis.
+
+The module supports multiple experimental runs and prompt variants (simple/complex)
+to facilitate comparative evaluation of different generation strategies.
+"""
 
 from __future__ import annotations
 
@@ -12,6 +22,16 @@ from llm_client import get_llm_client, LLMRequest, LLMResponse
 
 
 def get_prompts_path(full_run: int, prompt_variant: str) -> Path:
+    """
+    Determine the file path for generation prompts based on run parameters.
+    
+    Args:
+        full_run: Experimental run identifier (1 or 2)
+        prompt_variant: Type of prompt structure ("simple" or "complex")
+        
+    Returns:
+        Path object pointing to the appropriate prompts file
+    """
     if prompt_variant == "complex":
         return PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
     else:
@@ -19,6 +39,19 @@ def get_prompts_path(full_run: int, prompt_variant: str) -> Path:
 
 
 def get_output_path(llm_key: str, full_run: int, prompt_variant: str) -> Path:
+    """
+    Construct the output file path for generated texts.
+    
+    Creates the necessary directory structure if it does not exist.
+    
+    Args:
+        llm_key: Identifier for the LLM model being used
+        full_run: Experimental run identifier
+        prompt_variant: Type of prompt structure used
+        
+    Returns:
+        Path object for the output JSONL file
+    """
     out_dir = GENERATED_DIR / llm_key
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -29,12 +62,32 @@ def get_output_path(llm_key: str, full_run: int, prompt_variant: str) -> Path:
 
 
 def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
+    """
+    Execute the text generation pipeline for a complete experimental run.
+    
+    This function processes all prompts for the specified configuration, generates
+    text using the designated LLM, and writes results to a JSONL output file.
+    Each line in the output contains the prompt, generated text, and associated
+    metadata for downstream analysis.
+    
+    Args:
+        full_run: Experimental run identifier (1 or 2)
+        llm_key: LLM model identifier (e.g., "gpt-5.1")
+        prompt_variant: Prompt structure type ("simple" or "complex")
+        
+    Returns:
+        Path to the generated output file
+        
+    Raises:
+        FileNotFoundError: If the specified prompts file does not exist
+    """
     prompts_path = get_prompts_path(full_run, prompt_variant)
     output_path = get_output_path(llm_key, full_run, prompt_variant)
 
-    print(f"[run_generation] full_run={full_run} llm={llm_key} variant={prompt_variant}")
-    print(f"[run_generation] prompts: {prompts_path}")
-    print(f"[run_generation] output: {output_path}")
+    print(f"[run_generation] Executing generation pipeline")
+    print(f"[run_generation]   Run: {full_run}, Model: {llm_key}, Variant: {prompt_variant}")
+    print(f"[run_generation]   Input prompts: {prompts_path}")
+    print(f"[run_generation]   Output file: {output_path}")
 
     if not prompts_path.exists():
         raise FileNotFoundError(f"Prompts file not found: {prompts_path}")
@@ -60,8 +113,8 @@ def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
             max_tokens = prompt_record.get("max_tokens", 1200)
 
             print(
-                f"[run_generation] author={author_id} prompt_id={prompt_id} "
-                f"full_run={full_run} p={prompt_index} variant={prompt_variant}"
+                f"[run_generation] Processing prompt for author {author_id} "
+                f"(ID: {prompt_id}, Index: {prompt_index}, Variant: {prompt_variant})"
             )
 
             req = LLMRequest(
@@ -71,7 +124,7 @@ def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
                 prompt_text=prompt_record["prompt_text"],
                 max_tokens=max_tokens,
                 temperature=temp,
-                seed=None,  # seed not supported by Responses API
+                seed=None,  # Note: seed parameter not supported by OpenAI Responses API
                 metadata={
                     "prompt_index": prompt_index,
                     "generation_topic": generation_topic,

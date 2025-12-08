@@ -1,4 +1,23 @@
 # src/build_generation_prompts.py
+"""
+Prompt Construction Module for Authorship Mimicry Experiments
+
+This module constructs generation prompts for the authorship mimicry research project.
+It processes author-specific corpora, selects appropriate training examples based on
+topic similarity and consistency metrics, and formats prompts according to experimental
+requirements (simple vs. complex variants).
+
+The prompt construction process involves:
+1. Loading author metadata and topic assignments
+2. Selecting training reviews based on embedding similarity
+3. Formatting prompts with appropriate instructions and examples
+4. Generating output files for downstream text generation
+
+Key Functions:
+    load_author_list: Retrieves the list of authors included in the study
+    load_topics: Loads topic assignments for training and generation phases
+    build_prompts_for_full_run: Main orchestration function for prompt generation
+"""
 
 from __future__ import annotations
 
@@ -26,6 +45,15 @@ from generation_config import (
 
 
 def load_author_list() -> List[str]:
+    """
+    Load the list of author identifiers included in the experimental dataset.
+    
+    Returns:
+        List of author ID strings
+        
+    Note:
+        The function handles files with or without a header line containing "author_id"
+    """
     ids: List[str] = []
     with AUTHOR_LIST_FILE.open("r", encoding="utf-8") as f:
         first = True
@@ -42,6 +70,18 @@ def load_author_list() -> List[str]:
 
 
 def load_topics() -> Dict[str, Dict[str, str]]:
+    """
+    Load topic assignments for each author in the dataset.
+    
+    The topic file specifies which product categories are assigned to each author
+    for training examples and generation targets across different experimental phases.
+    
+    Returns:
+        Dictionary mapping author IDs to their topic assignments
+        
+    Format:
+        {author_id: {topic_key: category_name, ...}, ...}
+    """
     topics: Dict[str, Dict[str, str]] = {}
     with TOPICS_FILE.open("r", encoding="utf-8") as f:
         header = None
@@ -60,6 +100,15 @@ def load_topics() -> Dict[str, Dict[str, str]]:
 
 
 def load_author_categories() -> Dict[str, List[str]]:
+    """
+    Load product category associations for each author.
+    
+    Returns:
+        Dictionary mapping author IDs to lists of product categories they reviewed
+        
+    Note:
+        Filters out 'NA' entries from the category lists
+    """
     mapping: Dict[str, List[str]] = {}
     with AUTHOR_CATEGORIES_FILE.open("r", encoding="utf-8") as f:
         for line in f:
@@ -74,6 +123,18 @@ def load_author_categories() -> Dict[str, List[str]]:
 
 
 def load_selected_indices() -> Dict[str, List[int]]:
+    """
+    Load pre-computed indices of high-consistency reviews for each author.
+    
+    These indices identify reviews that demonstrate high stylistic consistency
+    with the author's typical writing patterns, as determined by previous analysis.
+    
+    Returns:
+        Dictionary mapping author IDs to lists of selected review indices
+        
+    Note:
+        Handles both list and string representations of indices in the CSV file
+    """
     mapping: Dict[str, List[int]] = {}
     with REFERENCE_CONSISTENCY_CSV.open("r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -97,6 +158,15 @@ def load_selected_indices() -> Dict[str, List[int]]:
 
 
 def read_review_text(path: Path) -> str:
+    """
+    Read the text content of a single review file.
+    
+    Args:
+        path: Path to the review text file
+        
+    Returns:
+        String containing the review text
+    """
     return path.read_text(encoding="utf-8")
 
 
