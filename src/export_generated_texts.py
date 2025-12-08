@@ -1,0 +1,151 @@
+# src/export_generated_texts.py
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any, Dict
+
+from generation_config import GENERATED_DIR, PROMPTS_DIR
+
+
+def extract_text(record: Dict[str, Any]) -> str:
+    """
+    Try a few common keys for the generated text.
+    Adjust if your run_generation.py uses a different field name.
+    """
+    for key in ["generated_text", "output_text", "text"]:
+        if key in record:
+            return record[key]
+
+    resp = record.get("response")
+    if isinstance(resp, dict):
+        for key in ["generated_text", "output_text", "text"]:
+            if key in resp:
+                return resp[key]
+
+    raise KeyError("Could not find generated text field in record.")
+
+
+def load_prompt_topics(full_run: int) -> Dict[str, str]:
+    """
+    Load prompt_id -> generation_topic from the prompts JSONL.
+
+    File: data/prompts/generation_prompts_fullrun{full_run}.jsonl
+    """
+    path = PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
+    if not path.exists():
+        raise FileNotFoundError(f"Prompts file not found: {path}")
+
+    mapping: Dict[str, str] = {}
+
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            rec = json.loads(line)
+            pid = rec.get("prompt_id")
+            topic = rec.get("generation_topic", "UNKNOWN_TOPIC")
+            if pid is not None:
+                mapping[pid] = topic
+
+    return mapping
+
+
+def clean_topic_for_filename(topic: str) -> str:
+    """
+    Make the topic safe for filenames: keep alnum/_/- only.
+    """
+    topic_clean = "".join(c for c in topic if c.isalnum() or c in "_-")
+    return topic_clean or "UNKNOWN_TOPIC"
+
+
+def export_generations(llm_key: str, full_run: int, author_filter: str | None = None) -> Path:
+    """
+    Read generations_fullrun{full_run}.jsonl for llm_key and export each
+    generation as a separate .txt file.
+
+    Files will be written to:
+      data/generated/<llm_key>/texts_fullrun<full_run>/<author_id>/
+    """
+    input_path = GENERATED_DIR / llm_key / f"generations_fullrun{full_run}.jsonl"
+    if not input_path.exists():
+        raise FileNotFoundError(f"Input JSONL not found: {input_path}")
+
+    # Load prompt_id -> topic mapping from the prompts JSONL
+    prompt_topics = load_prompt_topics(full_run)
+
+    output_root = GENERATED_DIR / llm_key / f"texts_fullrun{full_run}"
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    count = 0
+
+    with input_path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+
+            record = json.loads(line)
+
+            author_id = record.get("author_id", "UNKNOWN_AUTHOR")
+            if author_filter and author_id != author_filter:
+                continue
+
+            full_run_rec = record.get("full_run", full_run)
+            prompt_index = record.get("prompt_index")
+            prompt_id = record.get("prompt_id")
+
+            topic = "UNKNOWN_TOPIC"
+            if prompt_id is not None and prompt_id in prompt_topics:
+                topic = prompt_topics[prompt_id]
+
+            topic_clean = clean_topic_for_filename(topic)
+
+            text = extract_text(record)
+
+            # Folder per author
+            author_dir = output_root / author_id
+            author_dir.mkdir(parents=True, exist_ok=True)
+
+            # e.g. A132ETQPMHQ585_run1_p1_InstantVideo.txt
+            filename = f"{author_id}_run{full_run_rec}_p{prompt_index}_{topic_clean}.txt"
+            out_path = author_dir / filename
+
+            out_path.write_text(text, encoding="utf-8")
+            count += 1
+
+    print(f"[export] Wrote {count} text files under {output_root}")
+    return output_root
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--llm-key",
+        type=str,
+        default="gpt-5.1",
+        help="Which LLM key subfolder to read from (e.g. gpt-5.1).",
+    )
+    parser.add_argument(
+        "--full-run",
+        type=int,
+        choices=[1, 2],
+        required=True,
+        help="Which full run to export (1 or 2).",
+    )
+    parser.add_argument(
+        "--author-id",
+        type=str,
+        default=None,
+        help="If provided, only export generations for this author.",
+    )
+    args = parser.parse_args()
+
+    export_generations(args.llm_key, args.full_run, args.author_id)
+
+
+if __name__ == "__main__":
+    main()

@@ -38,7 +38,7 @@ class BaseLLMClient:
 
 
 class GPT51Client(BaseLLMClient):
-    def __init__(self, model: str = "gpt-5.1") -> None:
+    def __init__(self, model: str = "gpt-5.1-2025-11-13") -> None:
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError(
@@ -49,12 +49,12 @@ class GPT51Client(BaseLLMClient):
         self.llm_key = model
 
     def generate(self, req: LLMRequest) -> LLMResponse:
+        # Note: Responses API doesn't support 'seed' parameter
         response = self.client.responses.create(
             model=self.model,
             input=req.prompt_text,
             temperature=req.temperature,
             max_output_tokens=req.max_tokens,
-            seed=req.seed,
         )
 
         text = ""
@@ -115,8 +115,8 @@ class MockLLMClient(BaseLLMClient):
 
 def get_llm_client(llm_key: str) -> BaseLLMClient:
     key = llm_key.lower()
-    if key in {"gpt-5.1", "gpt5.1", "gpt5_1", "gpt-5"}:
-        return GPT51Client(model="gpt-5.1")
+    if key in {"gpt-5.1", "gpt5.1", "gpt5_1", "gpt-5", "gpt-5.1-2025-11-13"}:
+        return GPT51Client(model="gpt-5.1-2025-11-13")
     if key in {"mock", "fake"}:
         return MockLLMClient()
     raise ValueError(f"Unknown llm_key: {llm_key}")

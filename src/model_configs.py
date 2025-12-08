@@ -35,24 +35,24 @@ MODEL_CONFIGS = {
 
     # Sentence-transformers versions of LUAR
     "luar_crud_st": {
-        "hf_name": "gabrielloiseau/LUAR-CRUD-sentence-transformers",  # sentence-transformers API [oai_citation:0‡Hugging Face](https://huggingface.co/gabrielloiseau/LUAR-CRUD-sentence-transformers)
+        "hf_name": "gabrielloiseau/LUAR-CRUD-sentence-transformers",  # sentence-transformers API
         "family": "sentence_transformers",
-        "batch_size": 64,  # Increased for better throughput on MPS/CUDA
+        "batch_size": 32,
     },
     "luar_mud_st": {
-        "hf_name": "gabrielloiseau/LUAR-MUD-sentence-transformers",   # sentence-transformers API [oai_citation:1‡Hugging Face](https://huggingface.co/gabrielloiseau/LUAR-MUD-sentence-transformers)
+        "hf_name": "gabrielloiseau/LUAR-MUD-sentence-transformers",   # sentence-transformers API 
         "family": "sentence_transformers",
-        "batch_size": 64,  # Increased for better throughput on MPS/CUDA
+        "batch_size": 32,
     },
 
-    # Style-Embedding (SentenceTransformer style model) [oai_citation:2‡GitHub](https://github.com/nlpsoc/Style-Embeddings)
+    # Style-Embedding (SentenceTransformer style model)
     "style_embedding": {
         "hf_name": "AnnaWegmann/Style-Embedding",
         "family": "sentence_transformers",
-        "batch_size": 64,  # Increased for better throughput on MPS/CUDA
+        "batch_size": 32,
     },
 
-    # STAR: Style Transformer for Authorship Representations (uses pooler_output) [oai_citation:3‡Hugging Face](https://huggingface.co/AIDA-UPM/star?utm_source=chatgpt.com)
+    # STAR: Style Transformer for Authorship Representations (uses pooler_output)
     "star": {
         "hf_name": "AIDA-UPM/star",
         "tokenizer_name": "roberta-large",
