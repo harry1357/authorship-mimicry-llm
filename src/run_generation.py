@@ -5,19 +5,107 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable
+from typing import Any, Dict
 
-from generation_config import PROMPTS_DIR, GENERATED_DIR, DEFAULT_LLM_KEY
+from generation_config import GENERATED_DIR, PROMPTS_DIR, DEFAULT_LLM_KEY
 from llm_client import get_llm_client, LLMRequest, LLMResponse
 
 
-def load_prompts(path: Path) -> Iterable[Dict[str, Any]]:
-    with path.open("r", encoding="utf-8") as f:
-        for line in f:
+def get_prompts_path(full_run: int, prompt_variant: str) -> Path:
+    if prompt_variant == "complex":
+        return PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
+    else:
+        return PROMPTS_DIR / f"generation_prompts_simple_fullrun{full_run}.jsonl"
+
+
+def get_output_path(llm_key: str, full_run: int, prompt_variant: str) -> Path:
+    out_dir = GENERATED_DIR / llm_key
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    if prompt_variant == "complex":
+        return out_dir / f"generations_fullrun{full_run}.jsonl"
+    else:
+        return out_dir / f"generations_simple_fullrun{full_run}.jsonl"
+
+
+def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
+    prompts_path = get_prompts_path(full_run, prompt_variant)
+    output_path = get_output_path(llm_key, full_run, prompt_variant)
+
+    print(f"[run_generation] full_run={full_run} llm={llm_key} variant={prompt_variant}")
+    print(f"[run_generation] prompts: {prompts_path}")
+    print(f"[run_generation] output: {output_path}")
+
+    if not prompts_path.exists():
+        raise FileNotFoundError(f"Prompts file not found: {prompts_path}")
+
+    client = get_llm_client(llm_key)
+
+    written = 0
+
+    with prompts_path.open("r", encoding="utf-8") as pf, output_path.open(
+        "w", encoding="utf-8"
+    ) as out_f:
+        for line in pf:
             line = line.strip()
             if not line:
                 continue
-            yield json.loads(line)
+
+            prompt_record: Dict[str, Any] = json.loads(line)
+            author_id = prompt_record.get("author_id")
+            prompt_id = prompt_record.get("prompt_id")
+            prompt_index = prompt_record.get("prompt_index")
+            generation_topic = prompt_record.get("generation_topic")
+            temp = prompt_record.get("temperature", 0.7)
+            max_tokens = prompt_record.get("max_tokens", 1200)
+
+            print(
+                f"[run_generation] author={author_id} prompt_id={prompt_id} "
+                f"full_run={full_run} p={prompt_index} variant={prompt_variant}"
+            )
+
+            req = LLMRequest(
+                prompt_id=prompt_id,
+                author_id=author_id,
+                run_id=full_run,
+                prompt_text=prompt_record["prompt_text"],
+                max_tokens=max_tokens,
+                temperature=temp,
+                seed=None,  # seed not supported by Responses API
+                metadata={
+                    "prompt_index": prompt_index,
+                    "generation_topic": generation_topic,
+                    "prompt_variant": prompt_variant,
+                },
+            )
+
+            resp: LLMResponse = client.generate(req)
+
+            out_record: Dict[str, Any] = {
+                "llm_key": resp.llm_key,
+                "prompt_variant": prompt_variant,
+                "full_run": full_run,
+                "prompt_id": prompt_id,
+                "author_id": author_id,
+                "prompt_index": prompt_index,
+                "generation_topic": generation_topic,
+                "temperature": temp,
+                "max_tokens": max_tokens,
+                "prompt_text": prompt_record["prompt_text"],
+                "training_reviews": prompt_record.get("training_reviews"),
+                "metadata": prompt_record.get("metadata", {}),
+                "response": {
+                    "generated_text": resp.generated_text,
+                    "usage": resp.usage,
+                    "raw_response": resp.raw_response,
+                },
+            }
+
+            out_f.write(json.dumps(out_record, ensure_ascii=False) + "\n")
+            written += 1
+
+    print(f"[run_generation] wrote {written} generations to {output_path}")
+    return output_path
 
 
 def main():
@@ -26,94 +114,25 @@ def main():
         "--full-run",
         type=int,
         choices=[1, 2],
-        default=1,
-        help="Which full run to generate for (1 or 2).",
+        required=True,
+        help="Which full run (1 or 2).",
     )
     parser.add_argument(
         "--llm-key",
         type=str,
         default=DEFAULT_LLM_KEY,
-        help="LLM key to use (e.g. 'gpt-5.1' or 'mock').",
+        help="Which LLM key to use (e.g. gpt-5.1).",
     )
     parser.add_argument(
-        "--prompts-file",
+        "--prompt-variant",
         type=str,
-        default=None,
-        help="Optional explicit prompts file path.",
-    )
-    parser.add_argument(
-        "--output-file",
-        type=str,
-        default=None,
-        help="Optional explicit output file path.",
+        choices=["complex", "simple"],
+        default="complex",
+        help="Prompt variant to use.",
     )
     args = parser.parse_args()
 
-    full_run = args.full_run
-    llm_key = args.llm_key
-
-    if args.prompts_file is None:
-        prompts_path = PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
-    else:
-        prompts_path = Path(args.prompts_file)
-
-    if args.output_file is None:
-        out_dir = GENERATED_DIR / llm_key
-        out_dir.mkdir(parents=True, exist_ok=True)
-        output_path = out_dir / f"generations_fullrun{full_run}.jsonl"
-    else:
-        output_path = Path(args.output_file)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    print(f"[run_generation] full_run={full_run} llm={llm_key}")
-    print(f"[run_generation] prompts: {prompts_path}")
-    print(f"[run_generation] output: {output_path}")
-
-    client = get_llm_client(llm_key)
-
-    num = 0
-    with output_path.open("w", encoding="utf-8") as out_f:
-        for prompt_rec in load_prompts(prompts_path):
-            prompt_id = prompt_rec["prompt_id"]
-            author_id = prompt_rec["author_id"]
-            full_run_rec = int(prompt_rec.get("full_run", full_run))
-            prompt_index = int(prompt_rec.get("prompt_index", 1))
-
-            req = LLMRequest(
-                prompt_id=prompt_id,
-                author_id=author_id,
-                run_id=full_run_rec,
-                prompt_text=prompt_rec["prompt_text"],
-                max_tokens=prompt_rec.get("max_tokens", 1024),
-                temperature=prompt_rec.get("temperature", 0.8),
-                seed=prompt_rec.get("seed"),
-                metadata=prompt_rec.get("metadata"),
-            )
-
-            print(
-                f"[run_generation] author={author_id} prompt_id={prompt_id} "
-                f"full_run={full_run_rec} p={prompt_index}"
-            )
-
-            resp: LLMResponse = client.generate(req)
-
-            record: Dict[str, Any] = {
-                "generation_id": f"{prompt_id}__{llm_key}",
-                "prompt_id": resp.prompt_id,
-                "author_id": resp.author_id,
-                "full_run": full_run_rec,
-                "prompt_index": prompt_index,
-                "llm_key": resp.llm_key,
-                "generated_text": resp.generated_text,
-                "usage": resp.usage,
-                "prompt_text": req.prompt_text,
-                "prompt_metadata": req.metadata,
-            }
-
-            out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
-            num += 1
-
-    print(f"[run_generation] Wrote {num} generations to {output_path}")
+    run_generation(args.full_run, args.llm_key, args.prompt_variant)
 
 
 if __name__ == "__main__":

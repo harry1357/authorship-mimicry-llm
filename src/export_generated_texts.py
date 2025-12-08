@@ -11,16 +11,12 @@ from generation_config import GENERATED_DIR, PROMPTS_DIR
 
 
 def extract_text(record: Dict[str, Any]) -> str:
-    """
-    Try a few common keys for the generated text.
-    Adjust if your run_generation.py uses a different field name.
-    """
     for key in ["generated_text", "output_text", "text"]:
         if key in record:
             return record[key]
 
     resp = record.get("response")
-    if isinstance(resp, dict):
+    if isinstance(resp, Dict):
         for key in ["generated_text", "output_text", "text"]:
             if key in resp:
                 return resp[key]
@@ -28,18 +24,26 @@ def extract_text(record: Dict[str, Any]) -> str:
     raise KeyError("Could not find generated text field in record.")
 
 
-def load_prompt_topics(full_run: int) -> Dict[str, str]:
-    """
-    Load prompt_id -> generation_topic from the prompts JSONL.
+def get_prompts_path(full_run: int, prompt_variant: str) -> Path:
+    if prompt_variant == "complex":
+        return PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
+    else:
+        return PROMPTS_DIR / f"generation_prompts_simple_fullrun{full_run}.jsonl"
 
-    File: data/prompts/generation_prompts_fullrun{full_run}.jsonl
-    """
-    path = PROMPTS_DIR / f"generation_prompts_fullrun{full_run}.jsonl"
+
+def get_generations_path(llm_key: str, full_run: int, prompt_variant: str) -> Path:
+    if prompt_variant == "complex":
+        return GENERATED_DIR / llm_key / f"generations_fullrun{full_run}.jsonl"
+    else:
+        return GENERATED_DIR / llm_key / f"generations_simple_fullrun{full_run}.jsonl"
+
+
+def load_prompt_topics(full_run: int, prompt_variant: str) -> Dict[str, str]:
+    path = get_prompts_path(full_run, prompt_variant)
     if not path.exists():
         raise FileNotFoundError(f"Prompts file not found: {path}")
 
     mapping: Dict[str, str] = {}
-
     with path.open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -50,34 +54,27 @@ def load_prompt_topics(full_run: int) -> Dict[str, str]:
             topic = rec.get("generation_topic", "UNKNOWN_TOPIC")
             if pid is not None:
                 mapping[pid] = topic
-
     return mapping
 
 
 def clean_topic_for_filename(topic: str) -> str:
-    """
-    Make the topic safe for filenames: keep alnum/_/- only.
-    """
     topic_clean = "".join(c for c in topic if c.isalnum() or c in "_-")
     return topic_clean or "UNKNOWN_TOPIC"
 
 
-def export_generations(llm_key: str, full_run: int, author_filter: str | None = None) -> Path:
-    """
-    Read generations_fullrun{full_run}.jsonl for llm_key and export each
-    generation as a separate .txt file.
-
-    Files will be written to:
-      data/generated/<llm_key>/texts_fullrun<full_run>/<author_id>/
-    """
-    input_path = GENERATED_DIR / llm_key / f"generations_fullrun{full_run}.jsonl"
+def export_generations(
+    llm_key: str,
+    full_run: int,
+    prompt_variant: str,
+    author_filter: str | None = None,
+) -> Path:
+    input_path = get_generations_path(llm_key, full_run, prompt_variant)
     if not input_path.exists():
         raise FileNotFoundError(f"Input JSONL not found: {input_path}")
 
-    # Load prompt_id -> topic mapping from the prompts JSONL
-    prompt_topics = load_prompt_topics(full_run)
+    prompt_topics = load_prompt_topics(full_run, prompt_variant)
 
-    output_root = GENERATED_DIR / llm_key / f"texts_fullrun{full_run}"
+    output_root = GENERATED_DIR / llm_key / f"texts_{prompt_variant}_fullrun{full_run}"
     output_root.mkdir(parents=True, exist_ok=True)
 
     count = 0
@@ -106,18 +103,16 @@ def export_generations(llm_key: str, full_run: int, author_filter: str | None = 
 
             text = extract_text(record)
 
-            # Folder per author
             author_dir = output_root / author_id
             author_dir.mkdir(parents=True, exist_ok=True)
 
-            # e.g. A132ETQPMHQ585_run1_p1_InstantVideo.txt
             filename = f"{author_id}_run{full_run_rec}_p{prompt_index}_{topic_clean}.txt"
             out_path = author_dir / filename
 
             out_path.write_text(text, encoding="utf-8")
             count += 1
 
-    print(f"[export] Wrote {count} text files under {output_root}")
+    print(f"[export] Wrote {count} {prompt_variant} text files under {output_root}")
     return output_root
 
 
@@ -137,6 +132,13 @@ def main():
         help="Which full run to export (1 or 2).",
     )
     parser.add_argument(
+        "--prompt-variant",
+        type=str,
+        choices=["complex", "simple"],
+        default="complex",
+        help="Prompt variant to export.",
+    )
+    parser.add_argument(
         "--author-id",
         type=str,
         default=None,
@@ -144,7 +146,7 @@ def main():
     )
     args = parser.parse_args()
 
-    export_generations(args.llm_key, args.full_run, args.author_id)
+    export_generations(args.llm_key, args.full_run, args.prompt_variant, args.author_id)
 
 
 if __name__ == "__main__":
