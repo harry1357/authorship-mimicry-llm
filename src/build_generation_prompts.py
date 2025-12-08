@@ -243,6 +243,9 @@ def build_simple_prompt_text(
         f"about a product in the category: {generation_topic}."
     )
     lines.append("")
+    lines.append("Constraints:")
+    lines.append("Write around 600–900 words.")
+    lines.append("")
     lines.append("==== EXAMPLE REVIEWS START ====")
     lines.append("")
 
