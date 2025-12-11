@@ -51,10 +51,11 @@ class GenerationParams:
     Default parameters for text generation.
     
     Attributes:
-        max_tokens: Maximum number of tokens to generate (approximately 800 words)
+        max_tokens: Maximum number of tokens to generate (approximately 1300-1500 words)
+                   Increased from 1200 to 2000 to prevent truncation of reviews mid-sentence
         temperature: Sampling temperature controlling generation randomness
     """
-    max_tokens: int = 1200
+    max_tokens: int = 2000
     temperature: float = 0.7
 
 

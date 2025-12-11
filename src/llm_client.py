@@ -46,7 +46,7 @@ class LLMRequest:
     author_id: str
     run_id: int
     prompt_text: str
-    max_tokens: int = 1024
+    max_tokens: int = 2000
     temperature: float = 0.8
     seed: Optional[int] = None
     metadata: Optional[Dict[str, Any]] = None

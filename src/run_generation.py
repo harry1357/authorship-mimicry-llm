@@ -110,7 +110,7 @@ def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
             prompt_index = prompt_record.get("prompt_index")
             generation_topic = prompt_record.get("generation_topic")
             temp = prompt_record.get("temperature", 0.7)
-            max_tokens = prompt_record.get("max_tokens", 1200)
+            max_tokens = prompt_record.get("max_tokens", 2000)
 
             print(
                 f"[run_generation] Processing prompt for author {author_id} "
