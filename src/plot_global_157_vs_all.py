@@ -8,15 +8,19 @@ authors are compared to all ~2,144 authors in the corpus.
 Uses ONLY training documents (no generated texts).
 
 Generates:
-1. t-SNE plot: 2D visualization of all authors
-2. PCA plot: Shows first 2 principal components in embedding space
+1. t-SNE plot (2D): 2D visualization of all authors
+2. PCA plot (2D): Shows first 2 principal components in embedding space
 3. Distance distribution plot: Shows how far 157 authors are from others
 
 Usage:
+    # Generate both t-SNE and PCA
     python src/plot_global_157_vs_all.py --model-key style_embedding --full-run 1
     
-    # Generate for all models
-    python src/plot_global_157_vs_all.py --all-models --full-run 1
+    # Only regenerate PCA (when t-SNE is already good)
+    python src/plot_global_157_vs_all.py --model-key style_embedding --full-run 1 --plot-type pca
+    
+    # Generate for all models (only PCA)
+    python src/plot_global_157_vs_all.py --all-models --full-run 1 --plot-type pca
 """
 
 import argparse
@@ -25,6 +29,7 @@ from typing import List, Dict, Set, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from mpl_toolkits.mplot3d import Axes3D
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KernelDensity
@@ -81,10 +86,17 @@ def load_all_author_embeddings(model_key: str) -> Dict[str, np.ndarray]:
 
 def get_experimental_authors(model_key: str, full_run: int) -> Set[str]:
     """
-    Get the list of 157 experimental authors who have generated texts.
+    Get the list of experimental authors (100 for Phase 2, 157 for original runs).
     """
-    csv_path = CONSISTENCY_DIR / f"simple_vs_complex_{model_key}_fullrun{full_run}.csv"
+    # First try Phase 2 consistency CSV
+    phase2_csv = CONSISTENCY_DIR / f"{model_key}_phase2_top100.csv"
+    if phase2_csv.exists():
+        import pandas as pd
+        df = pd.read_csv(phase2_csv)
+        return set(df['author_id'].tolist())
     
+    # Fallback to original runs
+    csv_path = CONSISTENCY_DIR / f"simple_vs_complex_{model_key}_fullrun{full_run}.csv"
     if csv_path.exists():
         import pandas as pd
         df = pd.read_csv(csv_path)
@@ -244,7 +256,7 @@ def plot_tsne_comparison(
         marker='o',
         s=100,
         alpha=0.8,
-        label=f'157 Experimental authors',
+        label=f'{n_exp} Experimental authors',
         edgecolors='black',
         linewidths=1.5,
         zorder=3
@@ -291,7 +303,7 @@ def plot_tsne_comparison(
     ax.set_xlabel('t-SNE Dimension 1', fontsize=14, fontweight='bold')
     ax.set_ylabel('t-SNE Dimension 2', fontsize=14, fontweight='bold')
     ax.set_title(
-        f'157 Experimental Authors vs All Corpus Authors\n'
+        f'{n_exp} Experimental Authors vs All Corpus Authors\n'
         f'Model: {model_key}, Total: {n_total} authors',
         fontsize=16,
         fontweight='bold',
@@ -344,6 +356,7 @@ def plot_pca_comparison(
 ):
     """
     Create PCA plot showing first 2 principal components (raw embedding space).
+    With density heatmap and uniqueness labels like t-SNE.
     """
     print("[INFO] Preparing data for PCA...")
     
@@ -382,8 +395,29 @@ def plot_pca_comparison(
     
     print(f"[INFO] PCA explained variance: PC1={pca.explained_variance_ratio_[0]:.1%}, PC2={pca.explained_variance_ratio_[1]:.1%}")
     
+    # Calculate uniqueness scores
+    uniqueness_scores = calculate_uniqueness_scores(exp_coords, other_coords, exp_ids)
+    
     # Create plot
-    fig, ax = plt.subplots(figsize=(20, 16))
+    fig, ax = plt.subplots(figsize=(24, 20))
+    
+    # Create density heatmap from other authors (background)
+    print("[INFO] Computing density heatmap...")
+    try:
+        kde = gaussian_kde(other_coords.T)
+        
+        # Create grid
+        x_min, x_max = coords_2d[:, 0].min(), coords_2d[:, 0].max()
+        y_min, y_max = coords_2d[:, 1].min(), coords_2d[:, 1].max()
+        xx, yy = np.mgrid[x_min:x_max:100j, y_min:y_max:100j]
+        positions = np.vstack([xx.ravel(), yy.ravel()])
+        density = kde(positions).reshape(xx.shape)
+        
+        # Plot density as heatmap
+        im = ax.contourf(xx, yy, density, levels=20, cmap='YlOrRd', alpha=0.3)
+        plt.colorbar(im, ax=ax, label='Style Space Density', pad=0.02)
+    except Exception as e:
+        print(f"[WARNING] Could not compute density heatmap: {e}")
     
     # Plot other authors (gray, small, background)
     ax.scatter(
@@ -392,23 +426,66 @@ def plot_pca_comparison(
         c='lightgray',
         marker='o',
         s=15,
-        alpha=0.3,
+        alpha=0.4,
         label=f'Other authors (n={n_other})',
-        edgecolors='none'
+        edgecolors='none',
+        zorder=1
     )
     
-    # Plot experimental authors (colored, larger, foreground)
-    ax.scatter(
+    # Plot experimental authors (colored by uniqueness)
+    uniqueness_dict = {aid: score for aid, score, _ in uniqueness_scores}
+    colors_exp = [uniqueness_dict[aid] for aid in exp_ids]
+    
+    scatter = ax.scatter(
         exp_coords[:, 0],
         exp_coords[:, 1],
-        c='red',
+        c=colors_exp,
+        cmap='RdYlGn_r',
         marker='o',
-        s=80,
-        alpha=0.7,
+        s=100,
+        alpha=0.8,
         label=f'157 Experimental authors',
         edgecolors='black',
-        linewidths=1
+        linewidths=1.5,
+        zorder=3
     )
+    
+    cbar = plt.colorbar(scatter, ax=ax, label='Uniqueness Score\n(higher = more unique)', pad=0.02)
+    
+    # Label top 5 most unique and top 5 most typical
+    print("[INFO] Labeling most unique and typical authors...")
+    
+    # Top 5 unique
+    for author_id, score, rank in uniqueness_scores[:5]:
+        idx = exp_ids.index(author_id)
+        ax.annotate(
+            f'{author_id[:8]}...\n(Rank {rank})',
+            xy=(exp_coords[idx, 0], exp_coords[idx, 1]),
+            xytext=(10, 10),
+            textcoords='offset points',
+            fontsize=9,
+            fontweight='bold',
+            color='darkred',
+            bbox=dict(boxstyle='round,pad=0.3', facecolor='yellow', edgecolor='darkred', linewidth=2, alpha=0.9),
+            arrowprops=dict(arrowstyle='->', color='darkred', lw=1.5),
+            zorder=10
+        )
+    
+    # Top 5 typical
+    for author_id, score, rank in uniqueness_scores[-5:]:
+        idx = exp_ids.index(author_id)
+        ax.annotate(
+            f'{author_id[:8]}...\n(Rank {rank})',
+            xy=(exp_coords[idx, 0], exp_coords[idx, 1]),
+            xytext=(10, -20),
+            textcoords='offset points',
+            fontsize=9,
+            fontweight='bold',
+            color='darkgreen',
+            bbox=dict(boxstyle='round,pad=0.3', facecolor='lightblue', edgecolor='darkgreen', linewidth=2, alpha=0.9),
+            arrowprops=dict(arrowstyle='->', color='darkgreen', lw=1.5),
+            zorder=10
+        )
     
     # Styling
     ax.set_xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%} variance)', fontsize=14, fontweight='bold')
@@ -435,6 +512,240 @@ def plot_pca_comparison(
     return output_path
 
 
+def plot_tsne_3d(
+    all_embeddings: Dict[str, np.ndarray],
+    experimental_ids: Set[str],
+    model_key: str,
+    full_run: int,
+    output_dir: Path,
+):
+    """
+    Create 3D t-SNE plot to avoid 2D projection artifacts.
+    """
+    print("[INFO] Preparing data for 3D t-SNE...")
+    
+    # Separate experimental and other authors
+    exp_ids = []
+    exp_embs = []
+    other_ids = []
+    other_embs = []
+    
+    for author_id, emb in all_embeddings.items():
+        if author_id in experimental_ids:
+            exp_ids.append(author_id)
+            exp_embs.append(emb)
+        else:
+            other_ids.append(author_id)
+            other_embs.append(emb)
+    
+    exp_embs = np.array(exp_embs)
+    other_embs = np.array(other_embs)
+    
+    # Combine all
+    all_embs = np.vstack([exp_embs, other_embs])
+    
+    n_exp = len(exp_ids)
+    n_other = len(other_ids)
+    n_total = n_exp + n_other
+    
+    print(f"[INFO] Experimental authors: {n_exp}")
+    print(f"[INFO] Other authors: {n_other}")
+    print(f"[INFO] Total authors: {n_total}")
+    print(f"[INFO] Running 3D t-SNE (this may take several minutes)...")
+    
+    # Run t-SNE with 3 components
+    tsne = TSNE(
+        n_components=3,
+        random_state=42,
+        perplexity=min(50, n_total // 4),
+        max_iter=1000,
+        verbose=1,
+    )
+    coords_3d = tsne.fit_transform(all_embs)
+    
+    # Split coordinates
+    exp_coords = coords_3d[:n_exp]
+    other_coords = coords_3d[n_exp:]
+    
+    # Calculate uniqueness scores (using 3D coordinates)
+    uniqueness_scores = calculate_uniqueness_scores(exp_coords, other_coords, exp_ids)
+    uniqueness_dict = {aid: score for aid, score, _ in uniqueness_scores}
+    colors_exp = [uniqueness_dict[aid] for aid in exp_ids]
+    
+    print("[INFO] Creating 3D visualization...")
+    
+    # Create 3D plot
+    fig = plt.figure(figsize=(20, 16))
+    ax = fig.add_subplot(111, projection='3d')
+    
+    # Plot other authors (gray, small, background)
+    ax.scatter(
+        other_coords[:, 0],
+        other_coords[:, 1],
+        other_coords[:, 2],
+        c='lightgray',
+        marker='o',
+        s=10,
+        alpha=0.2,
+        label=f'Other authors (n={n_other})',
+        edgecolors='none'
+    )
+    
+    # Plot experimental authors (colored by uniqueness)
+    scatter = ax.scatter(
+        exp_coords[:, 0],
+        exp_coords[:, 1],
+        exp_coords[:, 2],
+        c=colors_exp,
+        cmap='RdYlGn_r',
+        marker='o',
+        s=80,
+        alpha=0.8,
+        label=f'157 Experimental authors',
+        edgecolors='black',
+        linewidths=1
+    )
+    
+    cbar = plt.colorbar(scatter, ax=ax, label='Uniqueness Score\n(higher = more unique)', pad=0.1, shrink=0.8)
+    
+    # Styling
+    ax.set_xlabel('t-SNE Dimension 1', fontsize=12, fontweight='bold')
+    ax.set_ylabel('t-SNE Dimension 2', fontsize=12, fontweight='bold')
+    ax.set_zlabel('t-SNE Dimension 3', fontsize=12, fontweight='bold')
+    ax.set_title(
+        f'3D t-SNE: 157 Experimental Authors vs All Corpus Authors\n'
+        f'Model: {model_key}, Total: {n_total} authors',
+        fontsize=14,
+        fontweight='bold',
+        pad=20
+    )
+    
+    ax.legend(loc='upper left', fontsize=10, framealpha=0.9)
+    
+    # Save
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / f"tsne_3d_157_vs_all_{model_key}_run{full_run}.png"
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    
+    print(f"[SAVED] 3D t-SNE plot: {output_path}")
+    
+    return output_path
+
+
+def plot_pca_3d(
+    all_embeddings: Dict[str, np.ndarray],
+    experimental_ids: Set[str],
+    model_key: str,
+    full_run: int,
+    output_dir: Path,
+):
+    """
+    Create 3D PCA plot showing first 3 principal components.
+    """
+    print("[INFO] Preparing data for 3D PCA...")
+    
+    # Separate experimental and other authors
+    exp_ids = []
+    exp_embs = []
+    other_ids = []
+    other_embs = []
+    
+    for author_id, emb in all_embeddings.items():
+        if author_id in experimental_ids:
+            exp_ids.append(author_id)
+            exp_embs.append(emb)
+        else:
+            other_ids.append(author_id)
+            other_embs.append(emb)
+    
+    exp_embs = np.array(exp_embs)
+    other_embs = np.array(other_embs)
+    
+    # Combine all
+    all_embs = np.vstack([exp_embs, other_embs])
+    
+    n_exp = len(exp_ids)
+    n_other = len(other_ids)
+    
+    print(f"[INFO] Running 3D PCA on {len(all_embs)} authors...")
+    
+    # Run PCA with 3 components
+    pca = PCA(n_components=3, random_state=42)
+    coords_3d = pca.fit_transform(all_embs)
+    
+    # Split coordinates
+    exp_coords = coords_3d[:n_exp]
+    other_coords = coords_3d[n_exp:]
+    
+    print(f"[INFO] PCA explained variance: PC1={pca.explained_variance_ratio_[0]:.1%}, "
+          f"PC2={pca.explained_variance_ratio_[1]:.1%}, PC3={pca.explained_variance_ratio_[2]:.1%}")
+    
+    # Calculate uniqueness scores
+    uniqueness_scores = calculate_uniqueness_scores(exp_coords, other_coords, exp_ids)
+    uniqueness_dict = {aid: score for aid, score, _ in uniqueness_scores}
+    colors_exp = [uniqueness_dict[aid] for aid in exp_ids]
+    
+    # Create 3D plot
+    fig = plt.figure(figsize=(20, 16))
+    ax = fig.add_subplot(111, projection='3d')
+    
+    # Plot other authors (gray, small, background)
+    ax.scatter(
+        other_coords[:, 0],
+        other_coords[:, 1],
+        other_coords[:, 2],
+        c='lightgray',
+        marker='o',
+        s=10,
+        alpha=0.2,
+        label=f'Other authors (n={n_other})',
+        edgecolors='none'
+    )
+    
+    # Plot experimental authors (colored by uniqueness)
+    scatter = ax.scatter(
+        exp_coords[:, 0],
+        exp_coords[:, 1],
+        exp_coords[:, 2],
+        c=colors_exp,
+        cmap='RdYlGn_r',
+        marker='o',
+        s=80,
+        alpha=0.8,
+        label=f'157 Experimental authors',
+        edgecolors='black',
+        linewidths=1
+    )
+    
+    cbar = plt.colorbar(scatter, ax=ax, label='Uniqueness Score\n(higher = more unique)', pad=0.1, shrink=0.8)
+    
+    # Styling
+    ax.set_xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%} variance)', fontsize=12, fontweight='bold')
+    ax.set_ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%} variance)', fontsize=12, fontweight='bold')
+    ax.set_zlabel(f'PC3 ({pca.explained_variance_ratio_[2]:.1%} variance)', fontsize=12, fontweight='bold')
+    ax.set_title(
+        f'3D PCA: 157 Experimental Authors vs All Corpus Authors\n'
+        f'Embedding Space Visualization - Model: {model_key}',
+        fontsize=14,
+        fontweight='bold',
+        pad=20
+    )
+    
+    ax.legend(loc='upper left', fontsize=10, framealpha=0.9)
+    
+    # Save
+    output_path = output_dir / f"pca_3d_157_vs_all_{model_key}_run{full_run}.png"
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    
+    print(f"[SAVED] 3D PCA plot: {output_path}")
+    
+    return output_path
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Compare 157 experimental authors against all corpus authors"
@@ -456,6 +767,18 @@ def main():
         default=1,
         choices=[1, 2],
         help="Experimental run number",
+    )
+    parser.add_argument(
+        "--plot-3d",
+        action="store_true",
+        help="Generate 3D plots (t-SNE and PCA) to avoid 2D projection artifacts",
+    )
+    parser.add_argument(
+        "--plot-type",
+        type=str,
+        default="both",
+        choices=["tsne", "pca", "both"],
+        help="Which plots to generate: tsne, pca, or both (default: both)",
     )
     
     args = parser.parse_args()
@@ -489,11 +812,21 @@ def main():
         
         # Generate plots
         try:
-            print("\n--- Generating t-SNE plot ---")
-            plot_tsne_comparison(all_embeddings, experimental_ids, model_key, args.full_run, output_dir)
+            if args.plot_type in ["tsne", "both"]:
+                print("\n--- Generating 2D t-SNE plot ---")
+                plot_tsne_comparison(all_embeddings, experimental_ids, model_key, args.full_run, output_dir)
+                
+                if args.plot_3d:
+                    print("\n--- Generating 3D t-SNE plot ---")
+                    plot_tsne_3d(all_embeddings, experimental_ids, model_key, args.full_run, output_dir)
             
-            print("\n--- Generating PCA plot ---")
-            plot_pca_comparison(all_embeddings, experimental_ids, model_key, args.full_run, output_dir)
+            if args.plot_type in ["pca", "both"]:
+                print("\n--- Generating 2D PCA plot ---")
+                plot_pca_comparison(all_embeddings, experimental_ids, model_key, args.full_run, output_dir)
+                
+                if args.plot_3d:
+                    print("\n--- Generating 3D PCA plot ---")
+                    plot_pca_3d(all_embeddings, experimental_ids, model_key, args.full_run, output_dir)
             
             print(f"\n[SUCCESS] Plots generated for {model_key}\n")
         except Exception as e:

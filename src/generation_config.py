@@ -36,13 +36,13 @@ PROMPTS_DIR.mkdir(parents=True, exist_ok=True)
 GENERATED_DIR.mkdir(parents=True, exist_ok=True)
 
 # Input configuration files
-AUTHOR_LIST_FILE = DATA_DIR / "author_ids_consensus_157.txt"
+AUTHOR_LIST_FILE = PROJECT_ROOT / "author_ids_phase2_top100.txt"
 TOPICS_FILE = PROJECT_ROOT / "author_ids_three_training_topics_x_two_two_generation_topics.txt"
 AUTHOR_CATEGORIES_FILE = PROJECT_ROOT / "author_ids_review_topics.txt"
 
-# Reference model and consistency metrics
-REFERENCE_MODEL_KEY = "luar_crud_orig"
-REFERENCE_CONSISTENCY_CSV = CONSISTENCY_DIR / "luar_crud_orig_top100.csv"
+# Reference model and consistency metrics (updated for Phase 2)
+REFERENCE_MODEL_KEY = "luar_mud_orig"
+REFERENCE_CONSISTENCY_CSV = CONSISTENCY_DIR / "luar_mud_orig_phase2_top100.csv"
 
 
 @dataclass
@@ -62,8 +62,8 @@ class GenerationParams:
 # Default generation parameters instance
 DEFAULT_GEN_PARAMS = GenerationParams()
 
-# Default LLM identifier (currently using GPT-5.1)
-DEFAULT_LLM_KEY = "gpt-5.1"
+# Default LLM identifier (currently using GPT-5.2)
+DEFAULT_LLM_KEY = "gpt-5.2-2025-12-11"
 
 # Style embedding model identifiers for subsequent stylometric analysis
 STYLE_MODEL_KEYS: List[str] = [

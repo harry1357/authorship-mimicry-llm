@@ -10,6 +10,19 @@ This project investigates the capability of large language models (LLMs) to repl
 2. How does prompt complexity and the number of training examples affect mimicry quality?
 3. Can automated stylometric analysis successfully distinguish between genuine author texts and LLM-generated mimicry attempts?
 
+## **NEW: Phase 1 - Model Selection (Authorship Verification)**
+
+Before the main mimicry experiment, we conduct a preliminary model selection study:
+
+1. **Generate embeddings** with split-and-average strategy (no truncation)
+2. **Run authorship verification** (same-author vs different-author discrimination)
+3. **Compare ROC curves** across all models at their optimal configurations
+4. **Select best model** for main experiment based on AUC
+
+**Scripts:**
+- `src/generate_split_embeddings.py` - Generate embeddings without truncation
+- `src/authorship_verification_experiment.py` - SA vs DA experiment with ROC curves
+
 ## Project Structure
 
 ```
@@ -47,6 +60,43 @@ For each experimental run, the system:
 
 - **Simple**: Minimal instruction
 - **Complex**: Detailed stylistic guidance
+
+---
+
+## **Quick Start: Phase 1 Model Selection**
+
+### Step 1: Generate Split-Average Embeddings
+
+```bash
+# Generate for all models at their optimal max_length
+for MODEL in luar_crud_orig luar_mud_orig luar_crud_st luar_mud_st style_embedding star; do
+    python src/generate_split_embeddings.py --model-key $MODEL --corpus all
+done
+```
+
+### Step 2: Run Authorship Verification Experiment
+
+```bash
+# Single model
+python src/authorship_verification_experiment.py --model-key star --use-split-embeddings --seed 42
+
+# All models
+python src/authorship_verification_experiment.py --all-models --use-split-embeddings --seed 42
+
+# With consistency check (5 repeats)
+python src/authorship_verification_experiment.py --all-models --use-split-embeddings --n-repeats 5
+```
+
+### Step 3: Compare Results
+
+Results saved to `data/plots/{model}/authorship_verification/`:
+- ROC curves with AUC scores
+- Distance distributions (SA vs DA)
+- Statistics (mean, std, Cohen's d)
+
+**Select the model with highest AUC for main experiment!**
+
+---
 
 ## Installation and Setup
 

@@ -20,36 +20,41 @@ for d in [EMBEDDINGS_DIR, CONSISTENCY_DIR, PLOTS_DIR]:
 # model_key values are used as folder names under data/embeddings and data/plots
 MODEL_CONFIGS = {
     # Original LUAR checkpoints (episode-based, custom code)
+    # Updated to use optimal max_length (512) for fair model comparison
     "luar_crud_orig": {
         "hf_name": "rrivera1849/LUAR-CRUD",
         "family": "luar_orig",      # handled via transformers + custom episode batching
-        "max_length": 256,
-        "batch_size": 8,
+        "max_length": 512,          # ✓ Using full capacity (was 256)
+        "batch_size": 32,
     },
     "luar_mud_orig": {
         "hf_name": "rrivera1849/LUAR-MUD",
         "family": "luar_orig",
-        "max_length": 256,
-        "batch_size": 8,
+        "max_length": 512,          # ✓ Using full capacity (was 256)
+        "batch_size": 32,
     },
 
     # Sentence-transformers versions of LUAR
+    # Limited to 128 by fine-tuning
     "luar_crud_st": {
         "hf_name": "gabrielloiseau/LUAR-CRUD-sentence-transformers",  # sentence-transformers API
         "family": "sentence_transformers",
-        "batch_size": 32,
+        "max_length": 128,          # ✓ Model's maximum
+        "batch_size": 32,            # Normalized batch size
     },
     "luar_mud_st": {
         "hf_name": "gabrielloiseau/LUAR-MUD-sentence-transformers",   # sentence-transformers API 
         "family": "sentence_transformers",
-        "batch_size": 32,
+        "max_length": 128,          # ✓ Model's maximum
+        "batch_size": 32,            # Normalized batch size
     },
 
     # Style-Embedding (SentenceTransformer style model)
     "style_embedding": {
         "hf_name": "AnnaWegmann/Style-Embedding",
         "family": "sentence_transformers",
-        "batch_size": 32,
+        "max_length": 514,          # ✓ Model's maximum (slightly odd number)
+        "batch_size": 32,            # Normalized batch size
     },
 
     # STAR: Style Transformer for Authorship Representations (uses pooler_output)
@@ -57,8 +62,8 @@ MODEL_CONFIGS = {
         "hf_name": "AIDA-UPM/star",
         "tokenizer_name": "roberta-large",
         "family": "star",
-        "max_length": 512,
-        "batch_size": 8,
+        "max_length": 512,          # ✓ Already using full capacity
+        "batch_size": 32,
     },
 }
 

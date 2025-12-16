@@ -1,0 +1,1284 @@
+
+================================================================================
+Authorship Verification Experiment: luar_crud_orig
+Split-average embeddings: True
+Seed: 42
+Repeats: 10
+================================================================================
+
+[INFO] Loading embeddings from: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/embeddings/split_average/luar_crud_orig
+Loading embeddings:   0%|          | 0/2144 [00:00<?, ?it/s]Loading embeddings:  12%|█▏        | 265/2144 [00:00<00:00, 2646.30it/s]Loading embeddings:  27%|██▋       | 579/2144 [00:00<00:00, 2936.34it/s]Loading embeddings:  41%|████      | 873/2144 [00:00<00:00, 2863.71it/s]Loading embeddings:  56%|█████▌    | 1194/2144 [00:00<00:00, 2994.65it/s]Loading embeddings:  72%|███████▏  | 1536/2144 [00:00<00:00, 3144.76it/s]Loading embeddings:  88%|████████▊ | 1882/2144 [00:00<00:00, 3250.08it/s]Loading embeddings: 100%|██████████| 2144/2144 [00:00<00:00, 3158.49it/s]
+[INFO] Loaded 2144 authors with >= 2 docs
+
+[INFO] Running experiment 1/10 (seed=42)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 248750.73it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 325240.98it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat01.txt
+[INFO] Optimal CosS: 0.8002, Optimal CosD: 0.1998
+
+[RESULTS] Repeat 1:
+  SA mean distance: 0.1482
+  DA mean distance: 0.2828
+  ROC AUC:          0.9543
+
+[INFO] Running experiment 2/10 (seed=43)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 269820.80it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 320271.66it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat02.txt
+[INFO] Optimal CosS: 0.8027, Optimal CosD: 0.1973
+
+[RESULTS] Repeat 2:
+  SA mean distance: 0.1474
+  DA mean distance: 0.2804
+  ROC AUC:          0.9542
+
+[INFO] Running experiment 3/10 (seed=44)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 294597.47it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 290242.64it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat03.txt
+[INFO] Optimal CosS: 0.7975, Optimal CosD: 0.2025
+
+[RESULTS] Repeat 3:
+  SA mean distance: 0.1499
+  DA mean distance: 0.2836
+  ROC AUC:          0.9553
+
+[INFO] Running experiment 4/10 (seed=45)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 301077.67it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 317210.05it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat04.txt
+[INFO] Optimal CosS: 0.7954, Optimal CosD: 0.2046
+
+[RESULTS] Repeat 4:
+  SA mean distance: 0.1481
+  DA mean distance: 0.2802
+  ROC AUC:          0.9515
+
+[INFO] Running experiment 5/10 (seed=46)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 308928.09it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 318051.49it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat05.txt
+[INFO] Optimal CosS: 0.8021, Optimal CosD: 0.1979
+
+[RESULTS] Repeat 5:
+  SA mean distance: 0.1477
+  DA mean distance: 0.2798
+  ROC AUC:          0.9542
+
+[INFO] Running experiment 6/10 (seed=47)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 296745.90it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 305278.47it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat06.txt
+[INFO] Optimal CosS: 0.8028, Optimal CosD: 0.1972
+
+[RESULTS] Repeat 6:
+  SA mean distance: 0.1471
+  DA mean distance: 0.2828
+  ROC AUC:          0.9566
+
+[INFO] Running experiment 7/10 (seed=48)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 305672.79it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 328484.36it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat07.txt
+[INFO] Optimal CosS: 0.7995, Optimal CosD: 0.2005
+
+[RESULTS] Repeat 7:
+  SA mean distance: 0.1482
+  DA mean distance: 0.2850
+  ROC AUC:          0.9573
+
+[INFO] Running experiment 8/10 (seed=49)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 309023.63it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 312992.51it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat08.txt
+[INFO] Optimal CosS: 0.7988, Optimal CosD: 0.2012
+
+[RESULTS] Repeat 8:
+  SA mean distance: 0.1496
+  DA mean distance: 0.2829
+  ROC AUC:          0.9549
+
+[INFO] Running experiment 9/10 (seed=50)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 299433.53it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 315164.47it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat09.txt
+[INFO] Optimal CosS: 0.8019, Optimal CosD: 0.1981
+
+[RESULTS] Repeat 9:
+  SA mean distance: 0.1489
+  DA mean distance: 0.2825
+  ROC AUC:          0.9526
+
+[INFO] Running experiment 10/10 (seed=51)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 314547.13it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 327515.31it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:417: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_means, da_means], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_orig/authorship_verification/authorship_verification_stats_luar_crud_orig_split_repeat10.txt
+[INFO] Optimal CosS: 0.8010, Optimal CosD: 0.1990
+
+[RESULTS] Repeat 10:
+  SA mean distance: 0.1492
+  DA mean distance: 0.2836
+  ROC AUC:          0.9553
+
+[INFO] Creating combined plots across 10 repeats...
+[SAVED] Combined ROC plot with 10 repeats
+[SAVED] Combined distribution plot with 10 repeats
+
+[OVERALL RESULTS] Across 10 repeats:
+  Mean AUC: 0.9546 ± 0.0016
+  Min AUC:  0.9515
+  Max AUC:  0.9573
+
+[SUCCESS] Experiment complete for luar_crud_orig
+
+================================================================================
+Authorship Verification Experiment: luar_mud_orig
+Split-average embeddings: True
+Seed: 42
+Repeats: 10
+================================================================================
+
+[INFO] Loading embeddings from: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/embeddings/split_average/luar_mud_orig
+Loading embeddings:   0%|          | 0/2144 [00:00<?, ?it/s]Loading embeddings:  13%|█▎        | 281/2144 [00:00<00:00, 2804.11it/s]Loading embeddings:  27%|██▋       | 569/2144 [00:00<00:00, 2837.59it/s]Loading embeddings:  40%|███▉      | 857/2144 [00:00<00:00, 2852.78it/s]Loading embeddings:  54%|█████▍    | 1156/2144 [00:00<00:00, 2901.33it/s]Loading embeddings:  68%|██████▊   | 1456/2144 [00:00<00:00, 2936.46it/s]Loading embeddings:  83%|████████▎ | 1778/2144 [00:00<00:00, 3031.99it/s]Loading embeddings:  98%|█████████▊| 2104/2144 [00:00<00:00, 3104.79it/s]Loading embeddings: 100%|██████████| 2144/2144 [00:00<00:00, 3003.30it/s]
+[INFO] Loaded 2144 authors with >= 2 docs
+
+[INFO] Running experiment 1/10 (seed=42)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 251259.79it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 322465.23it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat01.txt
+[INFO] Optimal CosS: 0.7410, Optimal CosD: 0.2590
+
+[RESULTS] Repeat 1:
+  SA mean distance: 0.1963
+  DA mean distance: 0.3730
+  ROC AUC:          0.9622
+
+[INFO] Running experiment 2/10 (seed=43)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 291626.27it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 310538.98it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat02.txt
+[INFO] Optimal CosS: 0.7329, Optimal CosD: 0.2671
+
+[RESULTS] Repeat 2:
+  SA mean distance: 0.1953
+  DA mean distance: 0.3685
+  ROC AUC:          0.9613
+
+[INFO] Running experiment 3/10 (seed=44)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 297236.32it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 312296.85it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat03.txt
+[INFO] Optimal CosS: 0.7288, Optimal CosD: 0.2712
+
+[RESULTS] Repeat 3:
+  SA mean distance: 0.1987
+  DA mean distance: 0.3714
+  ROC AUC:          0.9581
+
+[INFO] Running experiment 4/10 (seed=45)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 302149.98it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 311496.34it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat04.txt
+[INFO] Optimal CosS: 0.7481, Optimal CosD: 0.2519
+
+[RESULTS] Repeat 4:
+  SA mean distance: 0.1971
+  DA mean distance: 0.3692
+  ROC AUC:          0.9571
+
+[INFO] Running experiment 5/10 (seed=46)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 291531.73it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 303598.51it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat05.txt
+[INFO] Optimal CosS: 0.7417, Optimal CosD: 0.2583
+
+[RESULTS] Repeat 5:
+  SA mean distance: 0.1955
+  DA mean distance: 0.3697
+  ROC AUC:          0.9620
+
+[INFO] Running experiment 6/10 (seed=47)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 296785.08it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 308186.98it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat06.txt
+[INFO] Optimal CosS: 0.7261, Optimal CosD: 0.2739
+
+[RESULTS] Repeat 6:
+  SA mean distance: 0.1952
+  DA mean distance: 0.3708
+  ROC AUC:          0.9617
+
+[INFO] Running experiment 7/10 (seed=48)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 294269.70it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 311993.47it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat07.txt
+[INFO] Optimal CosS: 0.7319, Optimal CosD: 0.2681
+
+[RESULTS] Repeat 7:
+  SA mean distance: 0.1960
+  DA mean distance: 0.3745
+  ROC AUC:          0.9666
+
+[INFO] Running experiment 8/10 (seed=49)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 302699.20it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 315839.69it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat08.txt
+[INFO] Optimal CosS: 0.7287, Optimal CosD: 0.2713
+
+[RESULTS] Repeat 8:
+  SA mean distance: 0.1986
+  DA mean distance: 0.3734
+  ROC AUC:          0.9612
+
+[INFO] Running experiment 9/10 (seed=50)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 294945.32it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 307207.84it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat09.txt
+[INFO] Optimal CosS: 0.7311, Optimal CosD: 0.2689
+
+[RESULTS] Repeat 9:
+  SA mean distance: 0.1968
+  DA mean distance: 0.3716
+  ROC AUC:          0.9620
+
+[INFO] Running experiment 10/10 (seed=51)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 304369.19it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 320968.98it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:417: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_means, da_means], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/authorship_verification/authorship_verification_stats_luar_mud_orig_split_repeat10.txt
+[INFO] Optimal CosS: 0.7418, Optimal CosD: 0.2582
+
+[RESULTS] Repeat 10:
+  SA mean distance: 0.1973
+  DA mean distance: 0.3713
+  ROC AUC:          0.9613
+
+[INFO] Creating combined plots across 10 repeats...
+[SAVED] Combined ROC plot with 10 repeats
+[SAVED] Combined distribution plot with 10 repeats
+
+[OVERALL RESULTS] Across 10 repeats:
+  Mean AUC: 0.9614 ± 0.0024
+  Min AUC:  0.9571
+  Max AUC:  0.9666
+
+[SUCCESS] Experiment complete for luar_mud_orig
+
+================================================================================
+Authorship Verification Experiment: luar_crud_st
+Split-average embeddings: True
+Seed: 42
+Repeats: 10
+================================================================================
+
+[INFO] Loading embeddings from: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/embeddings/split_average/luar_crud_st
+Loading embeddings:   0%|          | 0/2144 [00:00<?, ?it/s]Loading embeddings:  12%|█▏        | 258/2144 [00:00<00:00, 2579.65it/s]Loading embeddings:  26%|██▌       | 558/2144 [00:00<00:00, 2824.44it/s]Loading embeddings:  42%|████▏     | 893/2144 [00:00<00:00, 3059.00it/s]Loading embeddings:  58%|█████▊    | 1240/2144 [00:00<00:00, 3216.82it/s]Loading embeddings:  74%|███████▎  | 1579/2144 [00:00<00:00, 3276.73it/s]Loading embeddings:  89%|████████▉ | 1907/2144 [00:00<00:00, 2969.36it/s]Loading embeddings: 100%|██████████| 2144/2144 [00:00<00:00, 3053.95it/s]
+[INFO] Loaded 2144 authors with >= 2 docs
+
+[INFO] Running experiment 1/10 (seed=42)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 261724.37it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 313910.28it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat01.txt
+[INFO] Optimal CosS: 0.6066, Optimal CosD: 0.3934
+
+[RESULTS] Repeat 1:
+  SA mean distance: 0.3332
+  DA mean distance: 0.4826
+  ROC AUC:          0.8869
+
+[INFO] Running experiment 2/10 (seed=43)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 308525.33it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 301339.98it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat02.txt
+[INFO] Optimal CosS: 0.6029, Optimal CosD: 0.3971
+
+[RESULTS] Repeat 2:
+  SA mean distance: 0.3315
+  DA mean distance: 0.4800
+  ROC AUC:          0.8900
+
+[INFO] Running experiment 3/10 (seed=44)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 305361.40it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 317299.59it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat03.txt
+[INFO] Optimal CosS: 0.5864, Optimal CosD: 0.4136
+
+[RESULTS] Repeat 3:
+  SA mean distance: 0.3355
+  DA mean distance: 0.4817
+  ROC AUC:          0.8855
+
+[INFO] Running experiment 4/10 (seed=45)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 307912.61it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 311410.04it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat04.txt
+[INFO] Optimal CosS: 0.6010, Optimal CosD: 0.3990
+
+[RESULTS] Repeat 4:
+  SA mean distance: 0.3326
+  DA mean distance: 0.4795
+  ROC AUC:          0.8887
+
+[INFO] Running experiment 5/10 (seed=46)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 307470.43it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 327527.24it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat05.txt
+[INFO] Optimal CosS: 0.6096, Optimal CosD: 0.3904
+
+[RESULTS] Repeat 5:
+  SA mean distance: 0.3313
+  DA mean distance: 0.4810
+  ROC AUC:          0.8936
+
+[INFO] Running experiment 6/10 (seed=47)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 291144.75it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 311539.50it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat06.txt
+[INFO] Optimal CosS: 0.6136, Optimal CosD: 0.3864
+
+[RESULTS] Repeat 6:
+  SA mean distance: 0.3307
+  DA mean distance: 0.4802
+  ROC AUC:          0.8904
+
+[INFO] Running experiment 7/10 (seed=48)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 302739.96it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 311852.82it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat07.txt
+[INFO] Optimal CosS: 0.5955, Optimal CosD: 0.4045
+
+[RESULTS] Repeat 7:
+  SA mean distance: 0.3316
+  DA mean distance: 0.4804
+  ROC AUC:          0.8897
+
+[INFO] Running experiment 8/10 (seed=49)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 304245.62it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 315673.39it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat08.txt
+[INFO] Optimal CosS: 0.5960, Optimal CosD: 0.4040
+
+[RESULTS] Repeat 8:
+  SA mean distance: 0.3338
+  DA mean distance: 0.4828
+  ROC AUC:          0.8935
+
+[INFO] Running experiment 9/10 (seed=50)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 293099.57it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 317254.82it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat09.txt
+[INFO] Optimal CosS: 0.5936, Optimal CosD: 0.4064
+
+[RESULTS] Repeat 9:
+  SA mean distance: 0.3335
+  DA mean distance: 0.4826
+  ROC AUC:          0.8876
+
+[INFO] Running experiment 10/10 (seed=51)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 297619.98it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 308081.39it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:417: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_means, da_means], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_crud_st/authorship_verification/authorship_verification_stats_luar_crud_st_split_repeat10.txt
+[INFO] Optimal CosS: 0.5965, Optimal CosD: 0.4035
+
+[RESULTS] Repeat 10:
+  SA mean distance: 0.3339
+  DA mean distance: 0.4861
+  ROC AUC:          0.8923
+
+[INFO] Creating combined plots across 10 repeats...
+[SAVED] Combined ROC plot with 10 repeats
+[SAVED] Combined distribution plot with 10 repeats
+
+[OVERALL RESULTS] Across 10 repeats:
+  Mean AUC: 0.8898 ± 0.0026
+  Min AUC:  0.8855
+  Max AUC:  0.8936
+
+[SUCCESS] Experiment complete for luar_crud_st
+
+================================================================================
+Authorship Verification Experiment: luar_mud_st
+Split-average embeddings: True
+Seed: 42
+Repeats: 10
+================================================================================
+
+[INFO] Loading embeddings from: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/embeddings/split_average/luar_mud_st
+Loading embeddings:   0%|          | 0/2144 [00:00<?, ?it/s]Loading embeddings:  11%|█         | 232/2144 [00:00<00:00, 2278.46it/s]Loading embeddings:  24%|██▎       | 505/2144 [00:00<00:00, 2539.56it/s]Loading embeddings:  39%|███▉      | 842/2144 [00:00<00:00, 2915.02it/s]Loading embeddings:  55%|█████▍    | 1176/2144 [00:00<00:00, 3081.47it/s]Loading embeddings:  69%|██████▉   | 1489/2144 [00:00<00:00, 3097.56it/s]Loading embeddings:  84%|████████▍ | 1799/2144 [00:00<00:00, 3087.16it/s]Loading embeddings: 100%|██████████| 2144/2144 [00:00<00:00, 3069.86it/s]
+[INFO] Loaded 2144 authors with >= 2 docs
+
+[INFO] Running experiment 1/10 (seed=42)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 277249.51it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 313778.84it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat01.txt
+[INFO] Optimal CosS: 0.6002, Optimal CosD: 0.3998
+
+[RESULTS] Repeat 1:
+  SA mean distance: 0.3299
+  DA mean distance: 0.4777
+  ROC AUC:          0.8902
+
+[INFO] Running experiment 2/10 (seed=43)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 285723.88it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 308176.41it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat02.txt
+[INFO] Optimal CosS: 0.6207, Optimal CosD: 0.3793
+
+[RESULTS] Repeat 2:
+  SA mean distance: 0.3288
+  DA mean distance: 0.4752
+  ROC AUC:          0.8881
+
+[INFO] Running experiment 3/10 (seed=44)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 303978.22it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 316774.26it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat03.txt
+[INFO] Optimal CosS: 0.6048, Optimal CosD: 0.3952
+
+[RESULTS] Repeat 3:
+  SA mean distance: 0.3337
+  DA mean distance: 0.4779
+  ROC AUC:          0.8840
+
+[INFO] Running experiment 4/10 (seed=45)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 295235.82it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 306328.78it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat04.txt
+[INFO] Optimal CosS: 0.6000, Optimal CosD: 0.4000
+
+[RESULTS] Repeat 4:
+  SA mean distance: 0.3316
+  DA mean distance: 0.4752
+  ROC AUC:          0.8834
+
+[INFO] Running experiment 5/10 (seed=46)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 285379.32it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 311712.29it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat05.txt
+[INFO] Optimal CosS: 0.5987, Optimal CosD: 0.4013
+
+[RESULTS] Repeat 5:
+  SA mean distance: 0.3286
+  DA mean distance: 0.4795
+  ROC AUC:          0.8960
+
+[INFO] Running experiment 6/10 (seed=47)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 283079.54it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 309523.55it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat06.txt
+[INFO] Optimal CosS: 0.6044, Optimal CosD: 0.3956
+
+[RESULTS] Repeat 6:
+  SA mean distance: 0.3279
+  DA mean distance: 0.4759
+  ROC AUC:          0.8939
+
+[INFO] Running experiment 7/10 (seed=48)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 297324.77it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 311356.13it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat07.txt
+[INFO] Optimal CosS: 0.5994, Optimal CosD: 0.4006
+
+[RESULTS] Repeat 7:
+  SA mean distance: 0.3298
+  DA mean distance: 0.4765
+  ROC AUC:          0.8904
+
+[INFO] Running experiment 8/10 (seed=49)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 295925.62it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 307207.84it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat08.txt
+[INFO] Optimal CosS: 0.6024, Optimal CosD: 0.3976
+
+[RESULTS] Repeat 8:
+  SA mean distance: 0.3297
+  DA mean distance: 0.4798
+  ROC AUC:          0.8953
+
+[INFO] Running experiment 9/10 (seed=50)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 296266.85it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 293252.50it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat09.txt
+[INFO] Optimal CosS: 0.6002, Optimal CosD: 0.3998
+
+[RESULTS] Repeat 9:
+  SA mean distance: 0.3308
+  DA mean distance: 0.4781
+  ROC AUC:          0.8895
+
+[INFO] Running experiment 10/10 (seed=51)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 289887.10it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 300735.33it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:417: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_means, da_means], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_st/authorship_verification/authorship_verification_stats_luar_mud_st_split_repeat10.txt
+[INFO] Optimal CosS: 0.6078, Optimal CosD: 0.3922
+
+[RESULTS] Repeat 10:
+  SA mean distance: 0.3324
+  DA mean distance: 0.4788
+  ROC AUC:          0.8876
+
+[INFO] Creating combined plots across 10 repeats...
+[SAVED] Combined ROC plot with 10 repeats
+[SAVED] Combined distribution plot with 10 repeats
+
+[OVERALL RESULTS] Across 10 repeats:
+  Mean AUC: 0.8899 ± 0.0041
+  Min AUC:  0.8834
+  Max AUC:  0.8960
+
+[SUCCESS] Experiment complete for luar_mud_st
+
+================================================================================
+Authorship Verification Experiment: style_embedding
+Split-average embeddings: True
+Seed: 42
+Repeats: 10
+================================================================================
+
+[INFO] Loading embeddings from: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/embeddings/split_average/style_embedding
+Loading embeddings:   0%|          | 0/2144 [00:00<?, ?it/s]Loading embeddings:   8%|▊         | 172/2144 [00:00<00:01, 1715.67it/s]Loading embeddings:  17%|█▋        | 356/2144 [00:00<00:01, 1785.79it/s]Loading embeddings:  26%|██▌       | 548/2144 [00:00<00:00, 1842.22it/s]Loading embeddings:  34%|███▍      | 733/2144 [00:00<00:00, 1839.70it/s]Loading embeddings:  44%|████▎     | 937/2144 [00:00<00:00, 1903.80it/s]Loading embeddings:  53%|█████▎    | 1142/2144 [00:00<00:00, 1950.67it/s]Loading embeddings:  63%|██████▎   | 1356/2144 [00:00<00:00, 2010.05it/s]Loading embeddings:  73%|███████▎  | 1568/2144 [00:00<00:00, 2043.52it/s]Loading embeddings:  84%|████████▎ | 1791/2144 [00:00<00:00, 2099.36it/s]Loading embeddings:  93%|█████████▎| 2001/2144 [00:01<00:00, 2041.77it/s]Loading embeddings: 100%|██████████| 2144/2144 [00:01<00:00, 1987.32it/s]
+[INFO] Loaded 2144 authors with >= 2 docs
+
+[INFO] Running experiment 1/10 (seed=42)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 260352.86it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 302231.22it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat01.txt
+[INFO] Optimal CosS: 0.8912, Optimal CosD: 0.1088
+
+[RESULTS] Repeat 1:
+  SA mean distance: 0.0786
+  DA mean distance: 0.3298
+  ROC AUC:          0.8790
+
+[INFO] Running experiment 2/10 (seed=43)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 285324.99it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 297324.77it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat02.txt
+[INFO] Optimal CosS: 0.8622, Optimal CosD: 0.1378
+
+[RESULTS] Repeat 2:
+  SA mean distance: 0.0774
+  DA mean distance: 0.3307
+  ROC AUC:          0.8736
+
+[INFO] Running experiment 3/10 (seed=44)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 293693.06it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 273888.70it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat03.txt
+[INFO] Optimal CosS: 0.8814, Optimal CosD: 0.1186
+
+[RESULTS] Repeat 3:
+  SA mean distance: 0.0765
+  DA mean distance: 0.3314
+  ROC AUC:          0.8818
+
+[INFO] Running experiment 4/10 (seed=45)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 288751.49it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 293137.78it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat04.txt
+[INFO] Optimal CosS: 0.8927, Optimal CosD: 0.1073
+
+[RESULTS] Repeat 4:
+  SA mean distance: 0.0806
+  DA mean distance: 0.3132
+  ROC AUC:          0.8581
+
+[INFO] Running experiment 5/10 (seed=46)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 288297.89it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 300403.80it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat05.txt
+[INFO] Optimal CosS: 0.8806, Optimal CosD: 0.1194
+
+[RESULTS] Repeat 5:
+  SA mean distance: 0.0763
+  DA mean distance: 0.3326
+  ROC AUC:          0.8800
+
+[INFO] Running experiment 6/10 (seed=47)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 280073.12it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 296296.14it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat06.txt
+[INFO] Optimal CosS: 0.8821, Optimal CosD: 0.1179
+
+[RESULTS] Repeat 6:
+  SA mean distance: 0.0790
+  DA mean distance: 0.3270
+  ROC AUC:          0.8773
+
+[INFO] Running experiment 7/10 (seed=48)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 286214.96it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 301967.35it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat07.txt
+[INFO] Optimal CosS: 0.8689, Optimal CosD: 0.1311
+
+[RESULTS] Repeat 7:
+  SA mean distance: 0.0765
+  DA mean distance: 0.3306
+  ROC AUC:          0.8786
+
+[INFO] Running experiment 8/10 (seed=49)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 291380.59it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 302271.86it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat08.txt
+[INFO] Optimal CosS: 0.8907, Optimal CosD: 0.1093
+
+[RESULTS] Repeat 8:
+  SA mean distance: 0.0778
+  DA mean distance: 0.3333
+  ROC AUC:          0.8798
+
+[INFO] Running experiment 9/10 (seed=50)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 283982.43it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 299573.18it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat09.txt
+[INFO] Optimal CosS: 0.8614, Optimal CosD: 0.1386
+
+[RESULTS] Repeat 9:
+  SA mean distance: 0.0796
+  DA mean distance: 0.3333
+  ROC AUC:          0.8697
+
+[INFO] Running experiment 10/10 (seed=51)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 290167.72it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 303424.36it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:417: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_means, da_means], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/style_embedding/authorship_verification/authorship_verification_stats_style_embedding_split_repeat10.txt
+[INFO] Optimal CosS: 0.8772, Optimal CosD: 0.1228
+
+[RESULTS] Repeat 10:
+  SA mean distance: 0.0773
+  DA mean distance: 0.3339
+  ROC AUC:          0.8849
+
+[INFO] Creating combined plots across 10 repeats...
+[SAVED] Combined ROC plot with 10 repeats
+[SAVED] Combined distribution plot with 10 repeats
+
+[OVERALL RESULTS] Across 10 repeats:
+  Mean AUC: 0.8763 ± 0.0073
+  Min AUC:  0.8581
+  Max AUC:  0.8849
+
+[SUCCESS] Experiment complete for style_embedding
+
+================================================================================
+Authorship Verification Experiment: star
+Split-average embeddings: True
+Seed: 42
+Repeats: 10
+================================================================================
+
+[INFO] Loading embeddings from: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/embeddings/split_average/star
+Loading embeddings:   0%|          | 0/2144 [00:00<?, ?it/s]Loading embeddings:   6%|▋         | 135/2144 [00:00<00:01, 1344.54it/s]Loading embeddings:  15%|█▍        | 313/2144 [00:00<00:01, 1597.59it/s]Loading embeddings:  23%|██▎       | 503/2144 [00:00<00:00, 1734.94it/s]Loading embeddings:  33%|███▎      | 701/2144 [00:00<00:00, 1828.70it/s]Loading embeddings:  42%|████▏     | 904/2144 [00:00<00:00, 1900.21it/s]Loading embeddings:  51%|█████     | 1098/2144 [00:00<00:00, 1911.55it/s]Loading embeddings:  60%|██████    | 1295/2144 [00:00<00:00, 1929.46it/s]Loading embeddings:  70%|███████   | 1501/2144 [00:00<00:00, 1970.22it/s]Loading embeddings:  80%|████████  | 1720/2144 [00:00<00:00, 2036.68it/s]Loading embeddings:  90%|█████████ | 1935/2144 [00:01<00:00, 2071.26it/s]Loading embeddings: 100%|██████████| 2144/2144 [00:01<00:00, 1954.39it/s]
+[INFO] Loaded 2144 authors with >= 2 docs
+
+[INFO] Running experiment 1/10 (seed=42)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 274130.83it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 297560.89it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat01.txt
+[INFO] Optimal CosS: 0.7946, Optimal CosD: 0.2054
+
+[RESULTS] Repeat 1:
+  SA mean distance: 0.1373
+  DA mean distance: 0.2942
+  ROC AUC:          0.9368
+
+[INFO] Running experiment 2/10 (seed=43)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 248434.62it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 302139.83it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat02.txt
+[INFO] Optimal CosS: 0.8021, Optimal CosD: 0.1979
+
+[RESULTS] Repeat 2:
+  SA mean distance: 0.1365
+  DA mean distance: 0.2903
+  ROC AUC:          0.9371
+
+[INFO] Running experiment 3/10 (seed=44)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 270779.52it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 284458.54it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat03.txt
+[INFO] Optimal CosS: 0.8089, Optimal CosD: 0.1911
+
+[RESULTS] Repeat 3:
+  SA mean distance: 0.1388
+  DA mean distance: 0.2946
+  ROC AUC:          0.9340
+
+[INFO] Running experiment 4/10 (seed=45)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 268611.86it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 291059.94it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat04.txt
+[INFO] Optimal CosS: 0.8117, Optimal CosD: 0.1883
+
+[RESULTS] Repeat 4:
+  SA mean distance: 0.1384
+  DA mean distance: 0.2873
+  ROC AUC:          0.9277
+
+[INFO] Running experiment 5/10 (seed=46)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 256615.81it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 283704.70it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat05.txt
+[INFO] Optimal CosS: 0.8163, Optimal CosD: 0.1837
+
+[RESULTS] Repeat 5:
+  SA mean distance: 0.1369
+  DA mean distance: 0.2946
+  ROC AUC:          0.9381
+
+[INFO] Running experiment 6/10 (seed=47)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 274658.31it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 285071.73it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat06.txt
+[INFO] Optimal CosS: 0.8141, Optimal CosD: 0.1859
+
+[RESULTS] Repeat 6:
+  SA mean distance: 0.1375
+  DA mean distance: 0.2937
+  ROC AUC:          0.9396
+
+[INFO] Running experiment 7/10 (seed=48)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 287597.15it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 296785.08it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat07.txt
+[INFO] Optimal CosS: 0.7891, Optimal CosD: 0.2109
+
+[RESULTS] Repeat 7:
+  SA mean distance: 0.1379
+  DA mean distance: 0.2947
+  ROC AUC:          0.9345
+
+[INFO] Running experiment 8/10 (seed=49)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 281961.18it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 298024.38it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat08.txt
+[INFO] Optimal CosS: 0.7939, Optimal CosD: 0.2061
+
+[RESULTS] Repeat 8:
+  SA mean distance: 0.1387
+  DA mean distance: 0.2942
+  ROC AUC:          0.9355
+
+[INFO] Running experiment 9/10 (seed=50)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 274197.70it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 283865.90it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat09.txt
+[INFO] Optimal CosS: 0.8006, Optimal CosD: 0.1994
+
+[RESULTS] Repeat 9:
+  SA mean distance: 0.1380
+  DA mean distance: 0.2969
+  ROC AUC:          0.9387
+
+[INFO] Running experiment 10/10 (seed=51)
+[INFO] Selecting 2 documents per author...
+[INFO] Selected 2144 authors with 2 docs
+[INFO] Creating same-author pairs...
+[INFO] Created 2144 SA pairs
+[INFO] Creating different-author pairs...
+[INFO] Created 2144 DA pairs
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 287128.83it/s]
+Computing distances:   0%|          | 0/2144 [00:00<?, ?it/s]Computing distances: 100%|██████████| 2144/2144 [00:00<00:00, 300022.95it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:207: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_distances, da_distances], labels=['Same Author', 'Different Authors'])
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/authorship_verification_experiment.py:417: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  ax2.boxplot([sa_means, da_means], labels=['Same Author', 'Different Authors'])
+[SAVED] Statistics: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/star/authorship_verification/authorship_verification_stats_star_split_repeat10.txt
+[INFO] Optimal CosS: 0.8085, Optimal CosD: 0.1915
+
+[RESULTS] Repeat 10:
+  SA mean distance: 0.1390
+  DA mean distance: 0.2929
+  ROC AUC:          0.9340
+
+[INFO] Creating combined plots across 10 repeats...
+[SAVED] Combined ROC plot with 10 repeats
+[SAVED] Combined distribution plot with 10 repeats
+
+[OVERALL RESULTS] Across 10 repeats:
+  Mean AUC: 0.9356 ± 0.0032
+  Min AUC:  0.9277
+  Max AUC:  0.9396
+
+[SUCCESS] Experiment complete for star

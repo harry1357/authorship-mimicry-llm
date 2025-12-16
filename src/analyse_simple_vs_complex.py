@@ -247,6 +247,27 @@ def compute_distance_to_centroid(
     return float(np.mean(distances))
 
 
+def compute_distance_to_training_docs(
+    embeddings: np.ndarray,
+    training_docs: np.ndarray
+) -> float:
+    """
+    Compute mean cosine distance from embeddings to actual training documents.
+    
+    This is more honest than distance to centroid, which can be artificially
+    optimistic since the centroid is an abstract average point.
+    
+    Args:
+        embeddings: 2D array of shape (n_samples, n_features) - generated docs
+        training_docs: 2D array of shape (n_training, n_features) - real docs
+        
+    Returns:
+        Mean distance to all training documents
+    """
+    distances = cosine_distance(embeddings, training_docs)
+    return float(np.mean(distances))
+
+
 def analyze_author(
     author_id: str,
     model_key: str,
@@ -285,9 +306,13 @@ def analyze_author(
     # Compute real author centroid
     real_centroid = np.mean(real_embs, axis=0)
     
-    # Compute distances to real centroid
+    # Compute distances to real centroid (LEGACY - may be optimistic)
     dist_real_to_complex = compute_distance_to_centroid(complex_embs, real_centroid)
     dist_real_to_simple = compute_distance_to_centroid(simple_embs, real_centroid)
+    
+    # Compute distances to actual training documents (MORE HONEST METRIC)
+    dist_to_training_complex = compute_distance_to_training_docs(complex_embs, real_embs)
+    dist_to_training_simple = compute_distance_to_training_docs(simple_embs, real_embs)
     
     # Compute intra-distances
     intra_real = compute_intra_distance(real_embs)
@@ -295,8 +320,13 @@ def analyze_author(
     intra_simple = compute_intra_distance(simple_embs)
     
     return {
+        # Legacy metrics (distance to centroid - may be optimistic)
         "dist_real_centroid_complex": dist_real_to_complex,
         "dist_real_centroid_simple": dist_real_to_simple,
+        # New honest metrics (distance to actual training docs)
+        "dist_to_training_complex": dist_to_training_complex,
+        "dist_to_training_simple": dist_to_training_simple,
+        # Intra-distances (for reference)
         "intra_real": intra_real,
         "intra_complex": intra_complex,
         "intra_simple": intra_simple,
@@ -370,16 +400,21 @@ def run_analysis(
         print(f"[analyse] ERROR: No valid results to write")
         return csv_path
     
-    # Sort results by simple prompt performance (best to worst)
-    results_sorted = sorted(results, key=lambda x: x["dist_real_centroid_simple"])
+    # Sort results by simple prompt performance (using HONEST metric - distance to training)
+    results_sorted = sorted(results, key=lambda x: x["dist_to_training_simple"])
     
     fieldnames = [
         "author_id",
         "model_key",
         "llm_key",
         "full_run",
+        # HONEST METRICS (distance to actual training docs) - USE THESE!
+        "dist_to_training_complex",
+        "dist_to_training_simple",
+        # Legacy metrics (distance to centroid - may be optimistic)
         "dist_real_centroid_complex",
         "dist_real_centroid_simple",
+        # Intra-distances for reference
         "intra_real",
         "intra_complex",
         "intra_simple",
@@ -390,19 +425,37 @@ def run_analysis(
         writer.writeheader()
         writer.writerows(results_sorted)
     
-    print(f"[analyse] Wrote {len(results_sorted)} rows to {csv_path} (sorted by simple performance)")
+    print(f"[analyse] Wrote {len(results_sorted)} rows to {csv_path}")
+    print(f"[analyse] Sorted by HONEST metric: dist_to_training_simple (distance to actual training docs)")
     if missing_count > 0:
         print(f"[analyse] WARNING: {missing_count} authors skipped (missing real embeddings with training data)")
     
     # Print summary statistics
     if results:
-        complex_dists = [r["dist_real_centroid_complex"] for r in results]
-        simple_dists = [r["dist_real_centroid_simple"] for r in results]
+        # New honest metrics
+        complex_dists_honest = [r["dist_to_training_complex"] for r in results]
+        simple_dists_honest = [r["dist_to_training_simple"] for r in results]
+        # Legacy metrics for comparison
+        complex_dists_legacy = [r["dist_real_centroid_complex"] for r in results]
+        simple_dists_legacy = [r["dist_real_centroid_simple"] for r in results]
+        # Intra-real for context
+        intra_real_dists = [r["intra_real"] for r in results]
         
-        print(f"\n[analyse] Summary:")
-        print(f"  Complex prompt - Mean distance to real centroid: {np.mean(complex_dists):.4f}")
-        print(f"  Simple prompt  - Mean distance to real centroid: {np.mean(simple_dists):.4f}")
-        print(f"  Difference (simple - complex): {np.mean(simple_dists) - np.mean(complex_dists):.4f}")
+        print(f"\n[analyse] Summary Statistics:")
+        print(f"=" * 80)
+        print(f"HONEST METRICS (Distance to Actual Training Documents):")
+        print(f"  Complex prompt: {np.mean(complex_dists_honest):.4f} ± {np.std(complex_dists_honest):.4f}")
+        print(f"  Simple prompt:  {np.mean(simple_dists_honest):.4f} ± {np.std(simple_dists_honest):.4f}")
+        print(f"  Difference:     {np.mean(simple_dists_honest) - np.mean(complex_dists_honest):.4f}")
+        print(f"\nLegacy Metrics (Distance to Centroid - may be optimistic):")
+        print(f"  Complex prompt: {np.mean(complex_dists_legacy):.4f} ± {np.std(complex_dists_legacy):.4f}")
+        print(f"  Simple prompt:  {np.mean(simple_dists_legacy):.4f} ± {np.std(simple_dists_legacy):.4f}")
+        print(f"  Difference:     {np.mean(simple_dists_legacy) - np.mean(complex_dists_legacy):.4f}")
+        print(f"\nCentroid Optimism (how much closer centroid appears vs actual docs):")
+        print(f"  Complex: {np.mean(complex_dists_honest) - np.mean(complex_dists_legacy):.4f}")
+        print(f"  Simple:  {np.mean(simple_dists_honest) - np.mean(simple_dists_legacy):.4f}")
+        print(f"\nBaseline (Training Internal Distance): {np.mean(intra_real_dists):.4f}")
+        print(f"=" * 80)
     
     return csv_path
 
