@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/run_generation.py", line 21, in <module>
+    from llm_client import get_llm_client, LLMRequest, LLMResponse
+  File "/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/llm_client.py", line 24, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'

@@ -208,6 +208,8 @@ class MockLLMClient(BaseLLMClient):
 
 def get_llm_client(llm_key: str) -> BaseLLMClient:
     key = llm_key.lower()
+    if key in {"gpt-5.2", "gpt5.2", "gpt5_2", "gpt-5.2-2025-12-11"}:
+        return GPT51Client(model="gpt-5.2-2025-12-11")
     if key in {"gpt-5.1", "gpt5.1", "gpt5_1", "gpt-5", "gpt-5.1-2025-11-13"}:
         return GPT51Client(model="gpt-5.1-2025-11-13")
     if key in {"mock", "fake"}:
