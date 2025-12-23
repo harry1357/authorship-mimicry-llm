@@ -23,6 +23,20 @@ from typing import Any, Dict, Optional
 from dotenv import load_dotenv
 from openai import OpenAI
 
+# Optional: Google Generative AI for Gemini
+try:
+    from google import genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+
+# Optional: Anthropic Claude
+try:
+    import anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+
 # Load environment variables from the .env file in the project root directory
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
@@ -179,6 +193,308 @@ class GPT51Client(BaseLLMClient):
         )
 
 
+class Gemini3ProClient(BaseLLMClient):
+    """
+    Client implementation for Google's Gemini 3 Pro model.
+    
+    This client handles communication with the Google Generative AI API,
+    formats requests, and parses responses into the standardized LLMResponse format.
+    """
+    def __init__(self, model: str = "gemini-3-pro-preview") -> None:
+        """
+        Initialize the Gemini 3 Pro client with API credentials.
+        
+        Args:
+            model: The specific Gemini model version to use
+            
+        Raises:
+            RuntimeError: If GOOGLE_API_KEY environment variable is not configured
+                         or if google-genai package is not installed
+        """
+        if not GEMINI_AVAILABLE:
+            raise RuntimeError(
+                "google-genai package not installed. "
+                "Install with: pip install google-genai"
+            )
+        
+        api_key = os.environ.get("GOOGLE_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "GOOGLE_API_KEY is not set. Please export it before running."
+            )
+        
+        # Initialize client with new API
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = model
+        self.llm_key = model
+
+    def generate(self, req: LLMRequest) -> LLMResponse:
+        """
+        Generate text using the Google Gemini 3 Pro model.
+        
+        Args:
+            req: LLMRequest object containing generation parameters
+            
+        Returns:
+            LLMResponse object with generated text and usage statistics
+            
+        Raises:
+            Exception: If the API request fails or returns an error
+        """
+        from google.genai import types
+        
+        # Safety settings - set to BLOCK_NONE for product reviews (not harmful content)
+        safety_settings = [
+            types.SafetySetting(
+                category="HARM_CATEGORY_HARASSMENT",
+                threshold="BLOCK_NONE"
+            ),
+            types.SafetySetting(
+                category="HARM_CATEGORY_HATE_SPEECH",
+                threshold="BLOCK_NONE"
+            ),
+            types.SafetySetting(
+                category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                threshold="BLOCK_NONE"
+            ),
+            types.SafetySetting(
+                category="HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold="BLOCK_NONE"
+            ),
+        ]
+        
+        # Use temperature=1.0 (Gemini 3 recommendation)  
+        # Keep the requested temperature if it's already 1.0, otherwise use 1.0
+        temperature = 1.0 if req.temperature != 1.0 else req.temperature
+        
+        # Increase max_output_tokens for Gemini 3 with high thinking level
+        # Thinking uses significant tokens internally, so we need 3-4x for actual output
+        # Example: 2000 requested -> 6000 actual (allows ~2000 thinking + 4000 output)
+        max_tokens = req.max_tokens * 3
+        
+        print(f"[Gemini3ProClient] Using thinking_level='high' with {max_tokens} max tokens "
+              f"(requested: {req.max_tokens}, multiplied by 3x for thinking overhead)")
+        
+        generation_config = types.GenerateContentConfig(
+            temperature=temperature,
+            max_output_tokens=max_tokens,
+            safety_settings=safety_settings,
+            # Use HIGH thinking level for research-quality reasoning and style mimicry
+            thinking_config=types.ThinkingConfig(thinking_level="high")
+        )
+        
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=req.prompt_text,
+                config=generation_config
+            )
+            
+            # Extract generated text - Gemini 3 SDK handles this simply
+            text = response.text if hasattr(response, 'text') and response.text else ""
+            
+            # Handle cases where no text was generated
+            if not text:
+                # Check finish reason
+                finish_reason = None
+                if hasattr(response, 'candidates') and response.candidates:
+                    candidate = response.candidates[0]
+                    finish_reason = getattr(candidate, 'finish_reason', None)
+                    
+                    # Convert finish_reason enum to string
+                    finish_reason_str = str(finish_reason) if finish_reason else None
+                    
+                    if finish_reason_str and "SAFETY" in finish_reason_str:
+                        print(f"[WARNING] Content blocked by safety filters for {req.prompt_id}")
+                        print(f"[WARNING] Finish reason: {finish_reason_str}")
+                        text = "[CONTENT_BLOCKED_BY_SAFETY_FILTER]"
+                    elif finish_reason_str and ("MAX_TOKENS" in finish_reason_str or "LENGTH" in finish_reason_str):
+                        print(f"[WARNING] Generation truncated (max tokens) for {req.prompt_id}")
+                        # For MAX_TOKENS, try to get partial text
+                        if hasattr(candidate, 'content') and candidate.content and candidate.content.parts:
+                            for part in candidate.content.parts:
+                                if hasattr(part, 'text') and part.text:
+                                    text += part.text
+                        if not text:
+                            text = "[GENERATION_TRUNCATED_MAX_TOKENS]"
+                    elif finish_reason:
+                        print(f"[WARNING] Generation stopped with finish_reason={finish_reason_str} for {req.prompt_id}")
+                        text = f"[GENERATION_FAILED_{finish_reason_str}]"
+                    else:
+                        print(f"[ERROR] No text and no finish_reason for {req.prompt_id}")
+                        text = "[NO_TEXT_GENERATED]"
+                else:
+                    print(f"[ERROR] No candidates in response for {req.prompt_id}")
+                    text = "[NO_RESPONSE_CANDIDATES]"
+            
+            # Extract usage information if available
+            usage_dict: Dict[str, Any] = {}
+            
+            # Debug: print response attributes to understand structure
+            if os.getenv("DEBUG_GEMINI"):
+                print(f"[DEBUG] Response type: {type(response)}")
+                print(f"[DEBUG] Response attributes: {dir(response)}")
+                if hasattr(response, "usage_metadata"):
+                    print(f"[DEBUG] Usage metadata: {response.usage_metadata}")
+                    print(f"[DEBUG] Usage metadata attributes: {dir(response.usage_metadata)}")
+            
+            # Try multiple possible locations for usage data
+            if hasattr(response, "usage_metadata") and response.usage_metadata:
+                usage = response.usage_metadata
+                # Try the attribute names from new API
+                usage_dict = {
+                    "input_tokens": (
+                        getattr(usage, "prompt_token_count", None) or
+                        getattr(usage, "input_tokens", None) or
+                        getattr(usage, "prompt_tokens", None)
+                    ),
+                    "output_tokens": (
+                        getattr(usage, "candidates_token_count", None) or
+                        getattr(usage, "output_tokens", None) or
+                        getattr(usage, "completion_tokens", None)
+                    ),
+                    "total_tokens": (
+                        getattr(usage, "total_token_count", None) or
+                        getattr(usage, "total_tokens", None)
+                    ),
+                }
+            
+            # Fallback: try to access raw response attributes
+            if not usage_dict.get("input_tokens") and hasattr(response, "_raw_response"):
+                raw = response._raw_response
+                if hasattr(raw, "usage_metadata"):
+                    raw_usage = raw.usage_metadata
+                    usage_dict = {
+                        "input_tokens": getattr(raw_usage, "prompt_token_count", None),
+                        "output_tokens": getattr(raw_usage, "candidates_token_count", None),
+                        "total_tokens": getattr(raw_usage, "total_token_count", None),
+                    }
+            
+            return LLMResponse(
+                prompt_id=req.prompt_id,
+                author_id=req.author_id,
+                run_id=req.run_id,
+                llm_key=self.llm_key,
+                generated_text=text.strip() if text else "",
+                usage=usage_dict,
+                raw_response={},  # keep small
+            )
+            
+        except Exception as e:
+            # Log the error and re-raise
+            print(f"[ERROR] Generation failed for {req.prompt_id}: {e}")
+            raise
+
+
+class ClaudeOpus45Client(BaseLLMClient):
+    """
+    Client implementation for Anthropic's Claude Opus 4.5 model.
+    
+    Uses the Anthropic Messages API for text generation.
+    """
+    
+    def __init__(self, model: str = "claude-opus-4-5-20251101") -> None:
+        """
+        Initialize the Claude Opus 4.5 client with API credentials.
+        
+        Args:
+            model: The specific Claude model version to use
+            
+        Raises:
+            ImportError: If anthropic library is not installed
+            ValueError: If ANTHROPIC_API_KEY environment variable is not set
+        """
+        self.llm_key = model
+        self.model = model
+        
+        if not ANTHROPIC_AVAILABLE:
+            raise ImportError(
+                "anthropic library not installed. Install with: pip install anthropic"
+            )
+        
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+        
+        self.client = anthropic.Anthropic(api_key=api_key)
+        print(f"[ClaudeOpus45Client] Initialized with model: {self.model}")
+    
+    def generate(self, req: LLMRequest) -> LLMResponse:
+        """
+        Generate text using the Claude Opus 4.5 model.
+        
+        Args:
+            req: LLMRequest containing prompt and generation parameters
+            
+        Returns:
+            LLMResponse with generated text and usage statistics
+            
+        Raises:
+            Exception: If the API call fails
+        """
+        try:
+            print(f"[ClaudeOpus45Client] Generating for prompt {req.prompt_id} (author: {req.author_id})")
+            
+            # Claude API parameters
+            # Use temperature from request (default 0.7)
+            temperature = req.temperature if req.temperature is not None else 0.7
+            
+            # Max tokens - Claude Opus 4.5 has high output capacity
+            max_tokens = req.max_tokens if req.max_tokens else 2000
+            
+            print(f"[ClaudeOpus45Client] Using temperature={temperature}, max_tokens={max_tokens}")
+            # Note: Opus 4.5 defaults to "high" effort, which provides maximum intelligence
+            # No need to explicitly set effort parameter
+            
+            # Make API call
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": req.prompt_text
+                    }
+                ]
+            )
+            
+            # Extract generated text
+            if not response.content or len(response.content) == 0:
+                raise ValueError("Empty response from Claude API")
+            
+            # Claude returns a list of content blocks; get the text from first block
+            text = response.content[0].text if hasattr(response.content[0], 'text') else str(response.content[0])
+            
+            # Extract usage information
+            usage_dict: Dict[str, Any] = {}
+            if hasattr(response, "usage"):
+                usage = response.usage
+                usage_dict = {
+                    "input_tokens": getattr(usage, "input_tokens", None),
+                    "output_tokens": getattr(usage, "output_tokens", None),
+                    "total_tokens": (
+                        (getattr(usage, "input_tokens", 0) or 0) + 
+                        (getattr(usage, "output_tokens", 0) or 0)
+                    ),
+                }
+            
+            return LLMResponse(
+                prompt_id=req.prompt_id,
+                author_id=req.author_id,
+                run_id=req.run_id,
+                llm_key=self.llm_key,
+                generated_text=text.strip() if text else "",
+                usage=usage_dict,
+                raw_response={},  # keep small
+            )
+            
+        except Exception as e:
+            # Log the error and re-raise
+            print(f"[ERROR] Claude generation failed for {req.prompt_id}: {e}")
+            raise
+
+
 class MockLLMClient(BaseLLMClient):
     def __init__(self, llm_key: str = "mock-llm") -> None:
         self.llm_key = llm_key
@@ -207,11 +523,37 @@ class MockLLMClient(BaseLLMClient):
 
 
 def get_llm_client(llm_key: str) -> BaseLLMClient:
+    """
+    Factory function to get the appropriate LLM client based on the model key.
+    
+    Args:
+        llm_key: Identifier for the LLM model
+        
+    Returns:
+        Appropriate LLM client instance
+        
+    Raises:
+        ValueError: If the llm_key is not recognized
+    """
     key = llm_key.lower()
+    
+    # OpenAI GPT models
     if key in {"gpt-5.2", "gpt5.2", "gpt5_2", "gpt-5.2-2025-12-11"}:
         return GPT51Client(model="gpt-5.2-2025-12-11")
     if key in {"gpt-5.1", "gpt5.1", "gpt5_1", "gpt-5", "gpt-5.1-2025-11-13"}:
         return GPT51Client(model="gpt-5.1-2025-11-13")
+    
+    # Google Gemini models
+    if key in {"gemini-3-pro", "gemini3pro", "gemini-3-pro-preview", "gemini_3_pro"}:
+        return Gemini3ProClient(model="gemini-3-pro-preview")
+    
+    # Anthropic Claude models
+    if key in {"claude-opus-4-5", "claude-opus-4.5", "opus-4-5", "opus-4.5", 
+               "claude-opus-4-5-20251101", "claude_opus_4_5"}:
+        return ClaudeOpus45Client(model="claude-opus-4-5-20251101")
+    
+    # Mock/test client
     if key in {"mock", "fake"}:
         return MockLLMClient()
+    
     raise ValueError(f"Unknown llm_key: {llm_key}")

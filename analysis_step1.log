@@ -1,0 +1,29 @@
+
+================================================================================
+Running analysis for model: luar_mud_orig
+================================================================================
+
+[analyse] Starting analysis: model=luar_mud_orig, llm=gpt-5.2-2025-12-11, run=1
+[analyse] Found 100 authors with complete data (simple + complex)
+Analyzing authors:   0%|          | 0/100 [00:00<?, ?it/s]Analyzing authors:  35%|███▌      | 35/100 [00:00<00:00, 349.61it/s]Analyzing authors:  83%|████████▎ | 83/100 [00:00<00:00, 423.01it/s]Analyzing authors: 100%|██████████| 100/100 [00:00<00:00, 417.07it/s]
+[analyse] Wrote 100 rows to /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/consistency/simple_vs_complex_luar_mud_orig_fullrun1.csv
+[analyse] Sorted by HONEST metric: dist_to_training_simple (distance to actual training docs)
+
+[analyse] Summary Statistics:
+================================================================================
+HONEST METRICS (Distance to Actual Training Documents):
+  Complex prompt: 0.4496 ± 0.0726
+  Simple prompt:  0.4485 ± 0.0661
+  Difference:     -0.0011
+
+Legacy Metrics (Distance to Centroid - may be optimistic):
+  Complex prompt: 0.3762 ± 0.0790
+  Simple prompt:  0.3749 ± 0.0712
+  Difference:     -0.0013
+
+Centroid Optimism (how much closer centroid appears vs actual docs):
+  Complex: 0.0734
+  Simple:  0.0736
+
+Baseline (Training Internal Distance): 0.2660
+================================================================================

@@ -1,0 +1,33 @@
+[INFO] Using HONEST metric: distance to actual training docs
+
+================================================================================
+TRUE Distance Visualization: luar_mud_orig, Run 1
+Visual Distance = Actual Distance (No Distortion!)
+================================================================================
+
+[INFO] Loading selected training indices...
+[INFO] Loading embeddings...
+Loading:   0%|          | 0/10 [00:00<?, ?it/s]Loading: 100%|██████████| 10/10 [00:00<00:00, 751.83it/s]
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/plot_true_distances.py:280: UserWarning: Glyph 11088 (\N{WHITE MEDIUM STAR}) missing from font(s) DejaVu Sans.
+  plt.tight_layout()
+/Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/src/plot_true_distances.py:281: UserWarning: Glyph 11088 (\N{WHITE MEDIUM STAR}) missing from font(s) DejaVu Sans.
+  plt.savefig(output_path, dpi=200, bbox_inches='tight')
+
+[INFO] Creating TRUE distance plots...
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank01_A2V1J3JT5OOZFO_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank02_AMYTL79JMGQ6D_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank03_A28RSMADFCBJDT_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank04_AVU1ILDDYW301_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank05_A10O7THJ2O20AG_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank06_A2PR5G1680ISEY_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank07_A1N655X9X7C6QY_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank08_A1509YCCYCYQQ3_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank09_AS4P74KQY9WR4_luar_mud_orig_run1.png
+[SAVED] /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_rank10_A3JQ58CZBV3FOZ_luar_mud_orig_run1.png
+
+[INFO] Creating grid view...
+[SAVED] Grid: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances/true_distance_grid_top10_luar_mud_orig_run1.png
+
+[SUCCESS] TRUE distance visualizations saved to: /Users/twoauthentic/Library/CloudStorage/Dropbox/hgupta/data/plots/luar_mud_orig/fullrun1_true_distances
+[INFO] In these plots, you CAN trust the visual distance!
+

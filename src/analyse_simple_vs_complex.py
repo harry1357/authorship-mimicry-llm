@@ -372,9 +372,9 @@ def run_analysis(
     
     print(f"[analyse] Found {len(author_ids)} authors with complete data (simple + complex)")
     
-    # Output CSV path
+    # Output CSV path - include LLM key to distinguish between different models
     CONSISTENCY_DIR.mkdir(parents=True, exist_ok=True)
-    csv_path = CONSISTENCY_DIR / f"simple_vs_complex_{model_key}_fullrun{full_run}.csv"
+    csv_path = CONSISTENCY_DIR / f"simple_vs_complex_{model_key}_{llm_key}_fullrun{full_run}.csv"
     
     # Analyze each author
     results = []
@@ -424,6 +424,24 @@ def run_analysis(
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(results_sorted)
+        
+        # Add summary metrics at the bottom of CSV
+        if results:
+            complex_dists = [r["dist_to_training_complex"] for r in results]
+            simple_dists = [r["dist_to_training_simple"] for r in results]
+            avg_complex = np.mean(complex_dists)
+            avg_simple = np.mean(simple_dists)
+            avg_overall = (avg_complex + avg_simple) / 2
+            
+            # Write blank row separator
+            f.write("\n")
+            # Write summary header
+            f.write("# MIMICRY PERFORMANCE METRICS (for LLM comparison)\n")
+            f.write(f"# Average dist_to_training_complex,{avg_complex:.6f}\n")
+            f.write(f"# Average dist_to_training_simple,{avg_simple:.6f}\n")
+            f.write(f"# Overall average (both prompts),{avg_overall:.6f}\n")
+            f.write(f"# Baseline (intra-author variation),{np.mean([r['intra_real'] for r in results]):.6f}\n")
+            f.write(f"# Number of authors,{len(results)}\n")
     
     print(f"[analyse] Wrote {len(results_sorted)} rows to {csv_path}")
     print(f"[analyse] Sorted by HONEST metric: dist_to_training_simple (distance to actual training docs)")
@@ -441,12 +459,19 @@ def run_analysis(
         # Intra-real for context
         intra_real_dists = [r["intra_real"] for r in results]
         
+        avg_complex = np.mean(complex_dists_honest)
+        avg_simple = np.mean(simple_dists_honest)
+        
         print(f"\n[analyse] Summary Statistics:")
         print(f"=" * 80)
         print(f"HONEST METRICS (Distance to Actual Training Documents):")
-        print(f"  Complex prompt: {np.mean(complex_dists_honest):.4f} ± {np.std(complex_dists_honest):.4f}")
-        print(f"  Simple prompt:  {np.mean(simple_dists_honest):.4f} ± {np.std(simple_dists_honest):.4f}")
-        print(f"  Difference:     {np.mean(simple_dists_honest) - np.mean(complex_dists_honest):.4f}")
+        print(f"  Complex prompt: {avg_complex:.4f} ± {np.std(complex_dists_honest):.4f}")
+        print(f"  Simple prompt:  {avg_simple:.4f} ± {np.std(simple_dists_honest):.4f}")
+        print(f"  Difference:     {avg_simple - avg_complex:.4f}")
+        print(f"\n⭐ MIMICRY PERFORMANCE METRICS (for LLM comparison):")
+        print(f"  Average dist_to_training_complex: {avg_complex:.6f}")
+        print(f"  Average dist_to_training_simple:  {avg_simple:.6f}")
+        print(f"  Overall average (both prompts):   {(avg_complex + avg_simple) / 2:.6f}")
         print(f"\nLegacy Metrics (Distance to Centroid - may be optimistic):")
         print(f"  Complex prompt: {np.mean(complex_dists_legacy):.4f} ± {np.std(complex_dists_legacy):.4f}")
         print(f"  Simple prompt:  {np.mean(simple_dists_legacy):.4f} ± {np.std(simple_dists_legacy):.4f}")
@@ -455,6 +480,10 @@ def run_analysis(
         print(f"  Complex: {np.mean(complex_dists_honest) - np.mean(complex_dists_legacy):.4f}")
         print(f"  Simple:  {np.mean(simple_dists_honest) - np.mean(simple_dists_legacy):.4f}")
         print(f"\nBaseline (Training Internal Distance): {np.mean(intra_real_dists):.4f}")
+        print(f"=" * 80)
+        print(f"\n💡 Use these metrics to compare LLM mimicry performance:")
+        print(f"   Lower distance = Better mimicry")
+        print(f"   Baseline (intra-author variation) = {np.mean(intra_real_dists):.4f}")
         print(f"=" * 80)
     
     return csv_path

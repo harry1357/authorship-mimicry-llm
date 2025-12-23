@@ -41,6 +41,38 @@ _sentence_transformers = None
 _transformers = None
 
 
+def split_text_in_half(text: str) -> tuple[str, str]:
+    """
+    Split text into two halves by character count.
+    Same approach as used for training documents.
+    """
+    text = text.strip()
+    if not text:
+        return "", ""
+    
+    mid_point = len(text) // 2
+    
+    # Try to split at a sentence boundary near the midpoint
+    # Look for '. ' within 10% of midpoint
+    search_start = max(0, mid_point - len(text) // 10)
+    search_end = min(len(text), mid_point + len(text) // 10)
+    search_text = text[search_start:search_end]
+    
+    sentence_end = search_text.rfind('. ')
+    if sentence_end != -1:
+        split_point = search_start + sentence_end + 2  # +2 for '. '
+    else:
+        split_point = mid_point
+    
+    left, right = text[:split_point].strip(), text[split_point:].strip()
+    
+    # Safeguard: if one half is empty, fall back to simple split
+    if not left or not right:
+        left, right = text[:mid_point].strip(), text[mid_point:].strip()
+    
+    return left, right
+
+
 def get_sentence_transformer(model_name: str, device: str):
     """Lazy load SentenceTransformer model."""
     global _sentence_transformers
@@ -339,19 +371,35 @@ def embed_generated_for_model(
             print(f"[embed_generated] WARNING: No texts found for {author_id}")
             continue
         
-        # Generate embeddings based on model family
+        # Split each text in half and embed both halves
+        all_halves = []
+        for text in texts:
+            half1, half2 = split_text_in_half(text)
+            all_halves.append(half1)
+            all_halves.append(half2)
+        
+        # Generate embeddings for all halves
         if family == "sentence_transformers":
-            embeddings = embed_sentence_transformers(model, texts, batch_size)
+            half_embeddings = embed_sentence_transformers(model, all_halves, batch_size)
         elif family == "luar_orig":
-            embeddings = embed_luar_orig(
-                model, tokenizer, texts, max_length, batch_size, device
+            half_embeddings = embed_luar_orig(
+                model, tokenizer, all_halves, max_length, batch_size, device
             )
         elif family == "star":
-            embeddings = embed_star(
-                model, tokenizer, texts, max_length, batch_size, device
+            half_embeddings = embed_star(
+                model, tokenizer, all_halves, max_length, batch_size, device
             )
         else:
             raise ValueError(f"Unsupported family type: {family}")
+        
+        # Average the two halves for each text to get final embedding
+        embeddings = []
+        for i in range(len(texts)):
+            emb1 = half_embeddings[i * 2]
+            emb2 = half_embeddings[i * 2 + 1]
+            avg_emb = (emb1 + emb2) / 2.0
+            embeddings.append(avg_emb)
+        embeddings = np.array(embeddings)
         
         # Save embeddings with metadata
         np.savez_compressed(
