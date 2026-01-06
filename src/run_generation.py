@@ -92,12 +92,27 @@ def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
     if not prompts_path.exists():
         raise FileNotFoundError(f"Prompts file not found: {prompts_path}")
 
+    # Load existing generations to support resume
+    existing_prompt_ids = set()
+    if output_path.exists():
+        print(f"[run_generation] Found existing output, loading completed prompts...")
+        with output_path.open("r", encoding="utf-8") as existing_f:
+            for line in existing_f:
+                try:
+                    record = json.loads(line.strip())
+                    existing_prompt_ids.add(record["prompt_id"])
+                except (json.JSONDecodeError, KeyError):
+                    continue
+        print(f"[run_generation] {len(existing_prompt_ids)} prompts already completed, will skip")
+
     client = get_llm_client(llm_key)
 
     written = 0
+    skipped = 0
 
+    # Open in append mode to preserve existing generations
     with prompts_path.open("r", encoding="utf-8") as pf, output_path.open(
-        "w", encoding="utf-8"
+        "a", encoding="utf-8"
     ) as out_f:
         for line in pf:
             line = line.strip()
@@ -111,6 +126,13 @@ def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
             generation_topic = prompt_record.get("generation_topic")
             temp = prompt_record.get("temperature", 0.7)
             max_tokens = prompt_record.get("max_tokens", 2000)
+
+            # Skip if already generated
+            if prompt_id in existing_prompt_ids:
+                skipped += 1
+                if skipped % 10 == 0:  # Print every 10 skips to avoid spam
+                    print(f"[run_generation] Skipped {skipped} already-completed prompts...")
+                continue
 
             print(
                 f"[run_generation] Processing prompt for author {author_id} "
@@ -157,7 +179,10 @@ def run_generation(full_run: int, llm_key: str, prompt_variant: str) -> Path:
             out_f.write(json.dumps(out_record, ensure_ascii=False) + "\n")
             written += 1
 
-    print(f"[run_generation] wrote {written} generations to {output_path}")
+    print(f"[run_generation] Completed: wrote {written} new generations to {output_path}")
+    if skipped > 0:
+        print(f"[run_generation] Skipped {skipped} already-completed prompts")
+    print(f"[run_generation] Total in file: {len(existing_prompt_ids) + written}")
     return output_path
 
 

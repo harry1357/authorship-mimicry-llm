@@ -193,6 +193,98 @@ class GPT51Client(BaseLLMClient):
         )
 
 
+class GPT52ProClient(BaseLLMClient):
+    """
+    Client implementation for OpenAI's GPT-5.2 Pro model with maximum reasoning.
+    
+    GPT-5.2 Pro is designed for tough problems requiring deep reasoning.
+    Uses the Responses API with reasoning.effort set to 'xhigh' (maximum).
+    Some requests may take several minutes to finish.
+    """
+    
+    def __init__(self, model: str = "gpt-5.2-pro-2025-12-11") -> None:
+        """
+        Initialize the GPT-5.2 Pro client with API credentials.
+        
+        Args:
+            model: The specific GPT-5.2 Pro model version to use
+            
+        Raises:
+            RuntimeError: If OPENAI_API_KEY environment variable is not configured
+        """
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "OPENAI_API_KEY is not set. Please export it before running."
+            )
+        self.client = OpenAI(api_key=api_key, timeout=600.0)  # Extended 10min timeout for reasoning
+        self.model = model
+        self.llm_key = model
+        print(f"[GPT52ProClient] Initialized with model: {self.model}, reasoning effort: xhigh")
+
+    def generate(self, req: LLMRequest) -> LLMResponse:
+        """
+        Generate text using the GPT-5.2 Pro model with maximum reasoning effort.
+        
+        Uses reasoning.effort='xhigh' for deepest reasoning capabilities.
+        Requests may take several minutes for complex problems.
+        
+        Args:
+            req: LLMRequest object containing generation parameters
+            
+        Returns:
+            LLMResponse object with generated text and usage statistics
+            
+        Raises:
+            Exception: If the API request fails or returns an error
+        """
+        print(f"[GPT52ProClient] Generating for prompt {req.prompt_id} (author: {req.author_id})")
+        print(f"[GPT52ProClient] Using reasoning.effort=xhigh (maximum reasoning)")
+        
+        response = self.client.responses.create(
+            model=self.model,
+            input=req.prompt_text,
+            temperature=req.temperature,
+            max_output_tokens=req.max_tokens,
+            reasoning={
+                "effort": "xhigh"  # Maximum reasoning effort
+            }
+        )
+
+        # Extract generated text from the API response
+        text = ""
+        if hasattr(response, "output_text") and response.output_text:
+            text = response.output_text
+        else:
+            try:
+                text = response.output[0].content[0].text
+            except Exception:
+                text = ""
+
+        usage_dict: Dict[str, Any] = {}
+        if hasattr(response, "usage") and response.usage is not None:
+            usage = response.usage
+            usage_dict = {
+                "input_tokens": getattr(usage, "input_tokens", None),
+                "output_tokens": getattr(usage, "output_tokens", None),
+                "total_tokens": getattr(usage, "total_tokens", None),
+            }
+            
+            # GPT-5.2 Pro may include reasoning tokens
+            if hasattr(usage, "reasoning_tokens"):
+                usage_dict["reasoning_tokens"] = usage.reasoning_tokens
+
+        return LLMResponse(
+            prompt_id=req.prompt_id,
+            author_id=req.author_id,
+            run_id=req.run_id,
+            llm_key=self.llm_key,
+            generated_text=text.strip(),
+            usage=usage_dict,
+            raw_response={},  # keep small
+        )
+
+
 class Gemini3ProClient(BaseLLMClient):
     """
     Client implementation for Google's Gemini 3 Pro model.
@@ -495,6 +587,450 @@ class ClaudeOpus45Client(BaseLLMClient):
             raise
 
 
+class Grok41FastReasoningClient(BaseLLMClient):
+    """
+    Client implementation for xAI's Grok 4.1 Fast Reasoning model.
+    
+    Uses the xAI API which is OpenAI-compatible. Grok 4.1 Fast Reasoning
+    provides fast inference with strong reasoning capabilities.
+    """
+    
+    def __init__(self, model: str = "grok-4-1-fast-reasoning") -> None:
+        """
+        Initialize the Grok 4.1 Fast Reasoning client with API credentials.
+        
+        Args:
+            model: The specific Grok model version to use
+            
+        Raises:
+            ValueError: If XAI_API_KEY environment variable is not set
+        """
+        self.llm_key = model
+        self.model = model
+        
+        api_key = os.getenv("XAI_API_KEY")
+        if not api_key:
+            raise ValueError("XAI_API_KEY environment variable not set")
+        
+        # xAI API is OpenAI-compatible, use OpenAI client with custom base URL
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.x.ai/v1",
+            timeout=3600.0,  # Extended timeout for reasoning models
+        )
+        print(f"[Grok41FastReasoningClient] Initialized with model: {self.model}")
+    
+    def generate(self, req: LLMRequest) -> LLMResponse:
+        """
+        Generate text using the Grok 4.1 Fast Reasoning model.
+        
+        Args:
+            req: LLMRequest containing prompt and generation parameters
+            
+        Returns:
+            LLMResponse with generated text and usage statistics
+            
+        Raises:
+            Exception: If the API call fails
+        """
+        try:
+            print(f"[Grok41FastReasoningClient] Generating for prompt {req.prompt_id} (author: {req.author_id})")
+            
+            # Grok API parameters (OpenAI-compatible)
+            temperature = req.temperature if req.temperature is not None else 0.7
+            max_tokens = req.max_tokens if req.max_tokens else 2000
+            
+            print(f"[Grok41FastReasoningClient] Using temperature={temperature}, max_tokens={max_tokens}")
+            
+            # Make API call using OpenAI-compatible interface
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are Grok, a highly intelligent, helpful AI assistant."
+                    },
+                    {
+                        "role": "user",
+                        "content": req.prompt_text
+                    }
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+                stream=False
+            )
+            
+            # Extract generated text
+            if not response.choices or len(response.choices) == 0:
+                raise ValueError("Empty response from Grok API")
+            
+            text = response.choices[0].message.content
+            
+            # Extract usage information
+            usage_dict: Dict[str, Any] = {}
+            if hasattr(response, "usage") and response.usage:
+                usage = response.usage
+                usage_dict = {
+                    "input_tokens": getattr(usage, "prompt_tokens", None),
+                    "output_tokens": getattr(usage, "completion_tokens", None),
+                    "total_tokens": getattr(usage, "total_tokens", None),
+                }
+                
+                # Grok reasoning models include reasoning_tokens in completion_tokens_details
+                if hasattr(usage, "completion_tokens_details"):
+                    details = usage.completion_tokens_details
+                    if hasattr(details, "reasoning_tokens"):
+                        usage_dict["reasoning_tokens"] = details.reasoning_tokens
+            
+            return LLMResponse(
+                prompt_id=req.prompt_id,
+                author_id=req.author_id,
+                run_id=req.run_id,
+                llm_key=self.llm_key,
+                generated_text=text.strip() if text else "",
+                usage=usage_dict,
+                raw_response={},  # keep small
+            )
+            
+        except Exception as e:
+            # Log the error and re-raise
+            print(f"[ERROR] Grok generation failed for {req.prompt_id}: {e}")
+            raise
+
+
+class SonarProClient(BaseLLMClient):
+    """
+    Client implementation for Perplexity's Sonar Pro model.
+    
+    Advanced search model optimized for complex queries with enhanced search
+    result accuracy. Uses OpenAI-compatible API.
+    """
+    
+    def __init__(self, model: str = "sonar-pro") -> None:
+        """
+        Initialize the Sonar Pro client with API credentials.
+        
+        Args:
+            model: The specific Sonar model version to use
+            
+        Raises:
+            ValueError: If PERPLEXITY_API_KEY environment variable is not set
+        """
+        self.llm_key = model
+        self.model = model
+        
+        api_key = os.getenv("PERPLEXITY_API_KEY")
+        if not api_key:
+            raise ValueError("PERPLEXITY_API_KEY environment variable not set")
+        
+        # Perplexity API is OpenAI-compatible
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.perplexity.ai",
+        )
+        print(f"[SonarProClient] Initialized with model: {self.model}")
+    
+    def generate(self, req: LLMRequest) -> LLMResponse:
+        """
+        Generate text using the Sonar Pro model.
+        
+        Args:
+            req: LLMRequest containing prompt and generation parameters
+            
+        Returns:
+            LLMResponse with generated text and usage statistics
+            
+        Raises:
+            Exception: If the API call fails
+        """
+        try:
+            print(f"[SonarProClient] Generating for prompt {req.prompt_id} (author: {req.author_id})")
+            
+            # Sonar API parameters (OpenAI-compatible)
+            temperature = req.temperature if req.temperature is not None else 0.7
+            max_tokens = req.max_tokens if req.max_tokens else 2000
+            
+            print(f"[SonarProClient] Using temperature={temperature}, max_tokens={max_tokens}")
+            
+            # Make API call using OpenAI-compatible interface
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": req.prompt_text
+                    }
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            
+            # Extract generated text
+            if not response.choices or len(response.choices) == 0:
+                raise ValueError("Empty response from Perplexity API")
+            
+            text = response.choices[0].message.content
+            
+            # Extract usage information
+            usage_dict: Dict[str, Any] = {}
+            if hasattr(response, "usage") and response.usage:
+                usage = response.usage
+                usage_dict = {
+                    "input_tokens": getattr(usage, "prompt_tokens", None),
+                    "output_tokens": getattr(usage, "completion_tokens", None),
+                    "total_tokens": getattr(usage, "total_tokens", None),
+                }
+                
+                # Perplexity includes search_context_size
+                if hasattr(usage, "search_context_size"):
+                    usage_dict["search_context_size"] = usage.search_context_size
+            
+            return LLMResponse(
+                prompt_id=req.prompt_id,
+                author_id=req.author_id,
+                run_id=req.run_id,
+                llm_key=self.llm_key,
+                generated_text=text.strip() if text else "",
+                usage=usage_dict,
+                raw_response={},  # keep small
+            )
+            
+        except Exception as e:
+            # Log the error and re-raise
+            print(f"[ERROR] Sonar Pro generation failed for {req.prompt_id}: {e}")
+            raise
+
+
+class SonarReasoningProClient(BaseLLMClient):
+    """
+    Client implementation for Perplexity's Sonar Reasoning Pro model.
+    
+    Advanced reasoning model with Chain-of-Thought (CoT) reasoning. Outputs
+    <think> blocks containing reasoning tokens followed by the response.
+    Uses OpenAI-compatible API.
+    """
+    
+    def __init__(self, model: str = "sonar-reasoning-pro") -> None:
+        """
+        Initialize the Sonar Reasoning Pro client with API credentials.
+        
+        Args:
+            model: The specific Sonar Reasoning model version to use
+            
+        Raises:
+            ValueError: If PERPLEXITY_API_KEY environment variable is not set
+        """
+        self.llm_key = model
+        self.model = model
+        
+        api_key = os.getenv("PERPLEXITY_API_KEY")
+        if not api_key:
+            raise ValueError("PERPLEXITY_API_KEY environment variable not set")
+        
+        # Perplexity API is OpenAI-compatible
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.perplexity.ai",
+        )
+        print(f"[SonarReasoningProClient] Initialized with model: {self.model}")
+    
+    def generate(self, req: LLMRequest) -> LLMResponse:
+        """
+        Generate text using the Sonar Reasoning Pro model.
+        
+        The model outputs <think> reasoning tokens followed by the response.
+        We extract and remove the <think> block for cleaner output.
+        
+        Args:
+            req: LLMRequest containing prompt and generation parameters
+            
+        Returns:
+            LLMResponse with generated text and usage statistics
+            
+        Raises:
+            Exception: If the API call fails
+        """
+        try:
+            print(f"[SonarReasoningProClient] Generating for prompt {req.prompt_id} (author: {req.author_id})")
+            
+            # Sonar API parameters (OpenAI-compatible)
+            temperature = req.temperature if req.temperature is not None else 0.7
+            max_tokens = req.max_tokens if req.max_tokens else 2000
+            
+            print(f"[SonarReasoningProClient] Using temperature={temperature}, max_tokens={max_tokens}")
+            
+            # Make API call using OpenAI-compatible interface
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": req.prompt_text
+                    }
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            
+            # Extract generated text
+            if not response.choices or len(response.choices) == 0:
+                raise ValueError("Empty response from Perplexity API")
+            
+            raw_text = response.choices[0].message.content
+            
+            # Remove <think> block if present (reasoning tokens)
+            # The model outputs: <think>reasoning...</think>actual response
+            text = raw_text
+            if raw_text and "<think>" in raw_text and "</think>" in raw_text:
+                # Extract content after </think>
+                import re
+                match = re.search(r'</think>\s*(.*)', raw_text, re.DOTALL)
+                if match:
+                    text = match.group(1).strip()
+                    print(f"[SonarReasoningProClient] Removed <think> reasoning block")
+            
+            # Extract usage information
+            usage_dict: Dict[str, Any] = {}
+            if hasattr(response, "usage") and response.usage:
+                usage = response.usage
+                usage_dict = {
+                    "input_tokens": getattr(usage, "prompt_tokens", None),
+                    "output_tokens": getattr(usage, "completion_tokens", None),
+                    "total_tokens": getattr(usage, "total_tokens", None),
+                }
+                
+                # Perplexity includes search_context_size
+                if hasattr(usage, "search_context_size"):
+                    usage_dict["search_context_size"] = usage.search_context_size
+            
+            return LLMResponse(
+                prompt_id=req.prompt_id,
+                author_id=req.author_id,
+                run_id=req.run_id,
+                llm_key=self.llm_key,
+                generated_text=text.strip() if text else "",
+                usage=usage_dict,
+                raw_response={},  # keep small
+            )
+            
+        except Exception as e:
+            # Log the error and re-raise
+            print(f"[ERROR] Sonar Reasoning Pro generation failed for {req.prompt_id}: {e}")
+            raise
+
+
+class DeepSeekReasonerClient(BaseLLMClient):
+    """
+    Client implementation for DeepSeek V3.2 (Thinking Mode).
+    
+    DeepSeek-V3.2 with reasoning/thinking capabilities. Uses OpenAI-compatible API.
+    Model: deepseek-reasoner (thinking mode of DeepSeek-V3.2)
+    """
+    
+    def __init__(self, model: str = "deepseek-reasoner") -> None:
+        """
+        Initialize the DeepSeek Reasoner client with API credentials.
+        
+        Args:
+            model: The specific DeepSeek model to use (deepseek-reasoner for thinking mode)
+            
+        Raises:
+            ValueError: If DEEPSEEK_API_KEY environment variable is not set
+        """
+        self.llm_key = model
+        self.model = model
+        
+        api_key = os.getenv("DEEPSEEK_API_KEY")
+        if not api_key:
+            raise ValueError("DEEPSEEK_API_KEY environment variable not set")
+        
+        # DeepSeek API is OpenAI-compatible
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.deepseek.com",
+        )
+        print(f"[DeepSeekReasonerClient] Initialized with model: {self.model}")
+    
+    def generate(self, req: LLMRequest) -> LLMResponse:
+        """
+        Generate text using the DeepSeek V3.2 Reasoner model.
+        
+        The reasoning/thinking mode provides enhanced reasoning capabilities.
+        
+        Args:
+            req: LLMRequest containing prompt and generation parameters
+            
+        Returns:
+            LLMResponse with generated text and usage statistics
+            
+        Raises:
+            Exception: If the API call fails
+        """
+        try:
+            print(f"[DeepSeekReasonerClient] Generating for prompt {req.prompt_id} (author: {req.author_id})")
+            
+            # DeepSeek API parameters (OpenAI-compatible)
+            temperature = req.temperature if req.temperature is not None else 0.7
+            max_tokens = req.max_tokens if req.max_tokens else 2000
+            
+            print(f"[DeepSeekReasonerClient] Using temperature={temperature}, max_tokens={max_tokens}")
+            
+            # Make API call using OpenAI-compatible interface
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a helpful assistant"
+                    },
+                    {
+                        "role": "user",
+                        "content": req.prompt_text
+                    }
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+                stream=False
+            )
+            
+            # Extract generated text
+            if not response.choices or len(response.choices) == 0:
+                raise ValueError("Empty response from DeepSeek API")
+            
+            text = response.choices[0].message.content
+            
+            # Extract usage information
+            usage_dict: Dict[str, Any] = {}
+            if hasattr(response, "usage") and response.usage:
+                usage = response.usage
+                usage_dict = {
+                    "input_tokens": getattr(usage, "prompt_tokens", None),
+                    "output_tokens": getattr(usage, "completion_tokens", None),
+                    "total_tokens": getattr(usage, "total_tokens", None),
+                }
+                
+                # DeepSeek reasoning models may include reasoning_tokens in details
+                if hasattr(usage, "completion_tokens_details"):
+                    details = usage.completion_tokens_details
+                    if hasattr(details, "reasoning_tokens"):
+                        usage_dict["reasoning_tokens"] = details.reasoning_tokens
+            
+            return LLMResponse(
+                prompt_id=req.prompt_id,
+                author_id=req.author_id,
+                run_id=req.run_id,
+                llm_key=self.llm_key,
+                generated_text=text.strip() if text else "",
+                usage=usage_dict,
+                raw_response={},  # keep small
+            )
+            
+        except Exception as e:
+            # Log the error and re-raise
+            print(f"[ERROR] DeepSeek generation failed for {req.prompt_id}: {e}")
+            raise
+
+
 class MockLLMClient(BaseLLMClient):
     def __init__(self, llm_key: str = "mock-llm") -> None:
         self.llm_key = llm_key
@@ -538,6 +1074,8 @@ def get_llm_client(llm_key: str) -> BaseLLMClient:
     key = llm_key.lower()
     
     # OpenAI GPT models
+    if key in {"gpt-5.2-pro", "gpt5.2-pro", "gpt5_2_pro", "gpt-5.2-pro-2025-12-11"}:
+        return GPT52ProClient(model="gpt-5.2-pro-2025-12-11")
     if key in {"gpt-5.2", "gpt5.2", "gpt5_2", "gpt-5.2-2025-12-11"}:
         return GPT51Client(model="gpt-5.2-2025-12-11")
     if key in {"gpt-5.1", "gpt5.1", "gpt5_1", "gpt-5", "gpt-5.1-2025-11-13"}:
@@ -551,6 +1089,21 @@ def get_llm_client(llm_key: str) -> BaseLLMClient:
     if key in {"claude-opus-4-5", "claude-opus-4.5", "opus-4-5", "opus-4.5", 
                "claude-opus-4-5-20251101", "claude_opus_4_5"}:
         return ClaudeOpus45Client(model="claude-opus-4-5-20251101")
+    
+    # xAI Grok models
+    if key in {"grok-4-1-fast-reasoning", "grok-4.1-fast-reasoning", "grok4.1-fast-reasoning",
+               "grok-4-1-fast", "grok-4.1-fast", "grok41-fast"}:
+        return Grok41FastReasoningClient(model="grok-4-1-fast-reasoning")
+    
+    # Perplexity Sonar models
+    if key in {"sonar-pro", "sonarpro", "sonar_pro"}:
+        return SonarProClient(model="sonar-pro")
+    if key in {"sonar-reasoning-pro", "sonar-reasoning", "sonareasoningpro", "sonar_reasoning_pro"}:
+        return SonarReasoningProClient(model="sonar-reasoning-pro")
+    
+    # DeepSeek models
+    if key in {"deepseek-reasoner", "deepseek-v3.2", "deepseek-v3", "deepseek"}:
+        return DeepSeekReasonerClient(model="deepseek-reasoner")
     
     # Mock/test client
     if key in {"mock", "fake"}:
