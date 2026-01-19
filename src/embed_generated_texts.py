@@ -373,8 +373,18 @@ def embed_generated_for_model(
         
         # Split each text in half and embed both halves
         all_halves = []
-        for text in texts:
+        
+        for i, text in enumerate(texts):
             half1, half2 = split_text_in_half(text)
+            
+            # Handle edge case: if split fails (one half empty), use full text for both
+            if not half1 or not half2:
+                print(f"[embed_generated] WARNING: {author_id} - Text {i} ({files[i]}) "
+                      f"produced empty half (len1={len(half1)}, len2={len(half2)}). "
+                      f"Using full text for both halves.")
+                half1 = text.strip()
+                half2 = text.strip()
+            
             all_halves.append(half1)
             all_halves.append(half2)
         

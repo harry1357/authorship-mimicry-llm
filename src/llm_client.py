@@ -240,11 +240,11 @@ class GPT52ProClient(BaseLLMClient):
         """
         print(f"[GPT52ProClient] Generating for prompt {req.prompt_id} (author: {req.author_id})")
         print(f"[GPT52ProClient] Using reasoning.effort=xhigh (maximum reasoning)")
+        print(f"[GPT52ProClient] Note: temperature parameter not supported by gpt-5.2-pro")
         
         response = self.client.responses.create(
             model=self.model,
             input=req.prompt_text,
-            temperature=req.temperature,
             max_output_tokens=req.max_tokens,
             reasoning={
                 "effort": "xhigh"  # Maximum reasoning effort

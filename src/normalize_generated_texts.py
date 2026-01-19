@@ -25,6 +25,38 @@ def normalize_whitespace(text: str) -> str:
     return text.strip()
 
 
+def ensure_complete_sentence(text: str) -> str:
+    """
+    Ensure text ends with a complete sentence by removing any trailing
+    incomplete sentence fragments.
+    
+    A complete sentence should end with . ! or ?
+    If text doesn't end with these, we backtrack to the last occurrence.
+    """
+    text = text.strip()
+    if not text:
+        return text
+    
+    # Check if already ends with sentence-ending punctuation
+    if text[-1] in '.!?':
+        return text
+    
+    # Find the last sentence-ending punctuation
+    last_period = text.rfind('.')
+    last_exclamation = text.rfind('!')
+    last_question = text.rfind('?')
+    
+    # Get the position of the last sentence ender
+    last_sentence_end = max(last_period, last_exclamation, last_question)
+    
+    if last_sentence_end > 0:
+        # Truncate to the last complete sentence
+        return text[:last_sentence_end + 1].strip()
+    
+    # If no sentence ending found, return as is (better than nothing)
+    return text
+
+
 def split_into_sentences(text: str) -> List[str]:
     """
     Simple sentence splitter based on punctuation patterns.
@@ -104,6 +136,8 @@ def normalize_file(in_path: Path, out_path: Path, target_bytes: int = DEFAULT_TA
     text = in_path.read_text(encoding="utf-8")
     text = normalize_whitespace(text)
     text = truncate_to_target_bytes(text, target_bytes=target_bytes)
+    # Ensure the final text ends with a complete sentence
+    text = ensure_complete_sentence(text)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(text, encoding="utf-8")
 
