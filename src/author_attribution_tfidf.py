@@ -27,6 +27,7 @@ import seaborn as sns
 import shap
 from typing import Dict, List, Tuple
 import json
+import string
 
 
 def load_raw_texts(model_key: str, full_run: int, base_path: Path, 
@@ -160,42 +161,88 @@ def load_raw_texts(model_key: str, full_run: int, base_path: Path,
     return texts, labels, author_ids
 
 
-def create_bow_features(texts: List[str], max_features: int = 5000) -> Tuple[np.ndarray, List[str]]:
-    """Create Bag of Words features (raw counts)."""
-    print(f"\nCreating Bag of Words features (max_features={max_features})...")
+def strip_punctuation_preprocessor(text: str) -> str:
+    """
+    Preprocessor that removes punctuation from text EXCEPT apostrophes.
+    Applied before tokenization.
+    This preserves contractions like "don't", "I've" while removing commas, periods, etc.
+    """
+    # Remove all punctuation EXCEPT apostrophes
+    punctuation_to_remove = string.punctuation.replace("'", "")
+    translator = str.maketrans('', '', punctuation_to_remove)
+    return text.translate(translator)
+
+
+def create_bow_features(texts: List[str], max_features: int = 5000, lowercase: bool = True,
+                       ngram_range: Tuple[int, int] = (1, 2)) -> Tuple[np.ndarray, List[str]]:
+    """
+    Create Bag of Words features (raw counts).
+    
+    Args:
+        texts: List of text documents
+        max_features: Maximum number of features to keep
+        lowercase: Whether to convert text to lowercase (True = case-insensitive)
+        ngram_range: Range of n-grams to extract (default: (1,2) for unigrams+bigrams)
+    """
+    ngram_label = f"{ngram_range[0]}-{ngram_range[1]}grams" if ngram_range[0] != ngram_range[1] else f"{ngram_range[0]}grams"
+    print(f"\nCreating Bag of Words features ({ngram_label}, max_features={max_features}, lowercase={lowercase})...")
     vectorizer = CountVectorizer(
         max_features=max_features,
-        ngram_range=(1, 2),  # unigrams and bigrams
+        ngram_range=ngram_range,
         min_df=2,  # ignore terms that appear in fewer than 2 documents
         max_df=0.95,  # ignore terms that appear in more than 95% of documents
-        stop_words='english'
+        stop_words='english',
+        lowercase=lowercase,  # Explicit case sensitivity control
+        preprocessor=strip_punctuation_preprocessor,  # Remove punctuation before tokenization
+        token_pattern=r'\S+'  # Whitespace tokenizer: splits only on whitespace
     )
     
     X = vectorizer.fit_transform(texts)
     feature_names = vectorizer.get_feature_names_out()
     
-    print(f"  ✓ Created {X.shape[1]} features from vocabulary of {len(feature_names)} terms")
+    # Count unigrams vs bigrams
+    unigrams = sum(1 for f in feature_names if ' ' not in f)
+    bigrams = len(feature_names) - unigrams
+    
+    print(f"  ✓ Created {X.shape[1]} features ({unigrams} unigrams, {bigrams} bigrams)")
     print(f"  ✓ Feature matrix shape: {X.shape}")
     
     return X.toarray(), feature_names.tolist()
 
 
-def create_tfidf_features(texts: List[str], max_features: int = 5000) -> Tuple[np.ndarray, List[str]]:
-    """Create TF-IDF features (weighted)."""
-    print(f"\nCreating TF-IDF features (max_features={max_features})...")
+def create_tfidf_features(texts: List[str], max_features: int = 5000, lowercase: bool = True,
+                         ngram_range: Tuple[int, int] = (1, 2)) -> Tuple[np.ndarray, List[str]]:
+    """
+    Create TF-IDF features (weighted).
+    
+    Args:
+        texts: List of text documents
+        max_features: Maximum number of features to keep
+        lowercase: Whether to convert text to lowercase (True = case-insensitive)
+        ngram_range: Range of n-grams to extract (default: (1,2) for unigrams+bigrams)
+    """
+    ngram_label = f"{ngram_range[0]}-{ngram_range[1]}grams" if ngram_range[0] != ngram_range[1] else f"{ngram_range[0]}grams"
+    print(f"\nCreating TF-IDF features ({ngram_label}, max_features={max_features}, lowercase={lowercase})...")
     vectorizer = TfidfVectorizer(
         max_features=max_features,
-        ngram_range=(1, 2),  # unigrams and bigrams
+        ngram_range=ngram_range,
         min_df=2,
         max_df=0.95,
         stop_words='english',
-        sublinear_tf=True  # Use log scaling for term frequency
+        sublinear_tf=True,  # Use log scaling for term frequency
+        lowercase=lowercase,  # Explicit case sensitivity control
+        preprocessor=strip_punctuation_preprocessor,  # Remove punctuation before tokenization
+        token_pattern=r'\S+'  # Whitespace tokenizer: splits only on whitespace
     )
     
     X = vectorizer.fit_transform(texts)
     feature_names = vectorizer.get_feature_names_out()
     
-    print(f"  ✓ Created {X.shape[1]} features from vocabulary of {len(feature_names)} terms")
+    # Count unigrams vs bigrams
+    unigrams = sum(1 for f in feature_names if ' ' not in f)
+    bigrams = len(feature_names) - unigrams
+    
+    print(f"  ✓ Created {X.shape[1]} features ({unigrams} unigrams, {bigrams} bigrams)")
     print(f"  ✓ Feature matrix shape: {X.shape}")
     
     return X.toarray(), feature_names.tolist()
@@ -570,6 +617,8 @@ def main():
                        help="Maximum number of features for BoW/TF-IDF")
     parser.add_argument("--n-estimators", type=int, default=100,
                        help="Number of trees in Random Forest")
+    parser.add_argument("--case-insensitive", action="store_true",
+                       help="Use case-insensitive features (default: case-sensitive)")
     parser.add_argument("--skip-luar", action="store_true",
                        help="Skip LUAR baseline (faster)")
     
@@ -578,11 +627,19 @@ def main():
     base_path = Path(__file__).parent.parent
     prompt_variant = "both"
     
+    # Determine case sensitivity (default is case-sensitive)
+    lowercase = args.case_insensitive
+    case_label = "case-insensitive" if args.case_insensitive else "case-sensitive"
+    
     print(f"\n{'='*80}")
     print(f"Author Attribution: Interpretable Features Analysis")
     print(f"{'='*80}")
     print(f"Model key: {args.model_key}")
     print(f"Full run: {args.full_run}")
+    print(f"Case sensitivity: {case_label}")
+    print(f"Tokenization: Whitespace (splits on spaces)")
+    print(f"Preprocessing: Punctuation removed (apostrophes kept)")
+    print(f"{'='*80}\n")
     print(f"Prompt variant: {prompt_variant}")
     print(f"Max features: {args.max_features}\n")
     
@@ -604,43 +661,68 @@ def main():
     
     all_results = []
     
-    # Method 1: Bag of Words (raw counts)
-    print("\n" + "="*80)
-    print("METHOD 1: BAG OF WORDS")
-    print("="*80)
-    X_bow, bow_features = create_bow_features(texts, max_features=args.max_features)
-    bow_results = train_and_evaluate(
-        X_bow, labels_array, author_ids, source_names, bow_features,
-        "Bag_of_Words", data_output_dir, args.n_estimators
-    )
-    all_results.append(bow_results)
-    save_top_words_report(bow_results, data_output_dir, args.full_run)
+    # Define ngram configurations
+    ngram_configs = [
+        ((1, 1), "unigrams"),
+        ((2, 2), "bigrams"),
+        ((1, 2), "unigrams_bigrams")
+    ]
     
-    # Comprehensive SHAP analysis for BoW
-    comprehensive_shap_analysis(
-        bow_results['classifier'], X_bow, labels_array,
-        bow_features, source_names, "Bag_of_Words",
-        plots_output_dir, data_output_dir, args.full_run
-    )
+    # Run Bag of Words for each ngram configuration
+    for ngram_range, ngram_name in ngram_configs:
+        print("\n" + "="*80)
+        print(f"BAG OF WORDS: {ngram_name.upper().replace('_', ' + ')}")
+        print("="*80)
+        
+        # Create subdirectories
+        bow_data_dir = data_output_dir / "bag_of_words" / ngram_name
+        bow_plots_dir = plots_output_dir / "bag_of_words" / ngram_name
+        bow_data_dir.mkdir(parents=True, exist_ok=True)
+        bow_plots_dir.mkdir(parents=True, exist_ok=True)
+        
+        X_bow, bow_features = create_bow_features(texts, max_features=args.max_features, 
+                                                  lowercase=lowercase, ngram_range=ngram_range)
+        bow_results = train_and_evaluate(
+            X_bow, labels_array, author_ids, source_names, bow_features,
+            f"BoW_{ngram_name}", bow_data_dir, args.n_estimators
+        )
+        all_results.append(bow_results)
+        save_top_words_report(bow_results, bow_data_dir, args.full_run)
+        
+        # SHAP analysis
+        comprehensive_shap_analysis(
+            bow_results['classifier'], X_bow, labels_array,
+            bow_features, source_names, f"BoW_{ngram_name}",
+            bow_plots_dir, bow_data_dir, args.full_run
+        )
     
-    # Method 2: TF-IDF (weighted)
-    print("\n" + "="*80)
-    print("METHOD 2: TF-IDF")
-    print("="*80)
-    X_tfidf, tfidf_features = create_tfidf_features(texts, max_features=args.max_features)
-    tfidf_results = train_and_evaluate(
-        X_tfidf, labels_array, author_ids, source_names, tfidf_features,
-        "TF-IDF", data_output_dir, args.n_estimators
-    )
-    all_results.append(tfidf_results)
-    save_top_words_report(tfidf_results, data_output_dir, args.full_run)
-    
-    # Comprehensive SHAP analysis for TF-IDF
-    comprehensive_shap_analysis(
-        tfidf_results['classifier'], X_tfidf, labels_array,
-        tfidf_features, source_names, "TF-IDF",
-        plots_output_dir, data_output_dir, args.full_run
-    )
+    # Run TF-IDF for each ngram configuration
+    for ngram_range, ngram_name in ngram_configs:
+        print("\n" + "="*80)
+        print(f"TF-IDF: {ngram_name.upper().replace('_', ' + ')}")
+        print("="*80)
+        
+        # Create subdirectories
+        tfidf_data_dir = data_output_dir / "tfidf" / ngram_name
+        tfidf_plots_dir = plots_output_dir / "tfidf" / ngram_name
+        tfidf_data_dir.mkdir(parents=True, exist_ok=True)
+        tfidf_plots_dir.mkdir(parents=True, exist_ok=True)
+        
+        X_tfidf, tfidf_features = create_tfidf_features(texts, max_features=args.max_features,
+                                                        lowercase=lowercase, ngram_range=ngram_range)
+        tfidf_results = train_and_evaluate(
+            X_tfidf, labels_array, author_ids, source_names, tfidf_features,
+            f"TF-IDF_{ngram_name}", tfidf_data_dir, args.n_estimators
+        )
+        all_results.append(tfidf_results)
+        save_top_words_report(tfidf_results, tfidf_data_dir, args.full_run)
+        
+        # SHAP analysis
+        comprehensive_shap_analysis(
+            tfidf_results['classifier'], X_tfidf, labels_array,
+            tfidf_features, source_names, f"TF-IDF_{ngram_name}",
+            tfidf_plots_dir, tfidf_data_dir, args.full_run
+        )
     
     # Method 3: LUAR embeddings (baseline)
     if not args.skip_luar:
