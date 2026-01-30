@@ -5,8 +5,9 @@ Analyze why some authors are mimicked better than others.
 Computes:
 1. Training set tightness (how clustered are the 6 training documents?)
 2. Author distinctiveness (how far from nearest neighbors?)
-3. Train-gen embedding similarity (semantic closeness proxy in embedding space)
-4. Correlations with mimicry performance
+3. Correlations with mimicry performance
+
+Note: Train-gen topic similarity is analyzed separately using independent TF-IDF metrics.
 
 
 """
@@ -251,17 +252,11 @@ def analyze_correlations(df: pd.DataFrame, output_dir: Path):
         raise KeyError(f"Missing required performance columns: {missing}. "
                       f"Available columns: {list(df.columns)}")
     
-    # Define factor columns - split into prompt-invariant and prompt-specific
-    # Prompt-invariant factors (training set properties + distinctiveness)
+    # Define factor columns - only training set properties and distinctiveness
     invariant_factors = [
         'mean_pairwise_dist', 'std_pairwise_dist', 'max_pairwise_dist', 'centroid_dispersion',
         'nearest_neighbor_dist', 'mean_neighbor_dist', 'k_nearest_avg'
     ]
-    
-    # Prompt-specific embedding similarity factors
-    simple_emb_factors = ['mean_train_gen_emb_sim_simple', 'max_train_gen_emb_sim_simple', 'min_train_gen_emb_sim_simple']
-    complex_emb_factors = ['mean_train_gen_emb_sim_complex', 'max_train_gen_emb_sim_complex', 'min_train_gen_emb_sim_complex']
-    avg_emb_factors = ['mean_train_gen_emb_sim_avg', 'max_train_gen_emb_sim_avg', 'min_train_gen_emb_sim_avg']
     
     # Performance metrics (lower distance = better mimicry)
     perf_simple = 'dist_to_training_simple'
@@ -305,82 +300,6 @@ def analyze_correlations(df: pd.DataFrame, output_dir: Path):
                         'spearman_p': spearman_p,
                         'n_samples': valid_mask.sum()
                     })
-    
-    # Prompt-specific embedding factors: match to corresponding performance
-    for factor in simple_emb_factors:
-        if factor in df.columns and perf_simple in df.columns:
-            valid_mask = df[factor].notna() & df[perf_simple].notna()
-            if valid_mask.sum() > 2:
-                # Extract values and guard against constant/near-constant arrays
-                x = df.loc[valid_mask, factor].astype(float).values
-                y = df.loc[valid_mask, perf_simple].astype(float).values
-                
-                # Skip if either variable is constant (prevents NaN correlations)
-                if np.nanstd(x) == 0 or np.nanstd(y) == 0:
-                    continue
-                
-                pearson_r, pearson_p = pearsonr(x, y)
-                spearman_r, spearman_p = spearmanr(x, y)
-                
-                results.append({
-                    'factor': factor,
-                    'performance_metric': perf_simple,
-                    'pearson_r': pearson_r,
-                    'pearson_p': pearson_p,
-                    'spearman_r': spearman_r,
-                    'spearman_p': spearman_p,
-                    'n_samples': valid_mask.sum()
-                })
-    
-    for factor in complex_emb_factors:
-        if factor in df.columns and perf_complex in df.columns:
-            valid_mask = df[factor].notna() & df[perf_complex].notna()
-            if valid_mask.sum() > 2:
-                # Extract values and guard against constant/near-constant arrays
-                x = df.loc[valid_mask, factor].astype(float).values
-                y = df.loc[valid_mask, perf_complex].astype(float).values
-                
-                # Skip if either variable is constant (prevents NaN correlations)
-                if np.nanstd(x) == 0 or np.nanstd(y) == 0:
-                    continue
-                
-                pearson_r, pearson_p = pearsonr(x, y)
-                spearman_r, spearman_p = spearmanr(x, y)
-                
-                results.append({
-                    'factor': factor,
-                    'performance_metric': perf_complex,
-                    'pearson_r': pearson_r,
-                    'pearson_p': pearson_p,
-                    'spearman_r': spearman_r,
-                    'spearman_p': spearman_p,
-                    'n_samples': valid_mask.sum()
-                })
-    
-    for factor in avg_emb_factors:
-        if factor in df.columns and perf_average in df.columns:
-            valid_mask = df[factor].notna() & df[perf_average].notna()
-            if valid_mask.sum() > 2:
-                # Extract values and guard against constant/near-constant arrays
-                x = df.loc[valid_mask, factor].astype(float).values
-                y = df.loc[valid_mask, perf_average].astype(float).values
-                
-                # Skip if either variable is constant (prevents NaN correlations)
-                if np.nanstd(x) == 0 or np.nanstd(y) == 0:
-                    continue
-                
-                pearson_r, pearson_p = pearsonr(x, y)
-                spearman_r, spearman_p = spearmanr(x, y)
-                
-                results.append({
-                    'factor': factor,
-                    'performance_metric': perf_average,
-                    'pearson_r': pearson_r,
-                    'pearson_p': pearson_p,
-                    'spearman_r': spearman_r,
-                    'spearman_p': spearman_p,
-                    'n_samples': valid_mask.sum()
-                })
     
     corr_df = pd.DataFrame(results)
     
@@ -550,24 +469,8 @@ def generate_summary_report(
                 else:
                     f.write(f"❓ **Author Distinctiveness**: No significant relationship (r={r:.3f}, q={q:.4f})\n\n")
             
-            # Train-gen embedding similarity (NOT lexical overlap!)
-            # Use prompt-specific column for this variant
-            if prompt_variant == "avg":
-                emb_sim_col = "mean_train_gen_emb_sim_avg"
-            else:
-                emb_sim_col = f'mean_train_gen_emb_sim_{prompt_variant}'
-            overlap_corr = relevant_corr[relevant_corr['factor'] == emb_sim_col]
-            if len(overlap_corr) > 0:
-                r = overlap_corr.iloc[0]['spearman_r']
-                q = overlap_corr.iloc[0].get('spearman_q', np.nan)
-                if pd.notna(q) and q < 0.05:
-                    if r < 0:
-                        f.write(f"✅ **Train-Gen Embedding Similarity HELPS**: Higher semantic similarity in embedding space predicts better mimicry (r={r:.3f}, q={q:.4f})\n\n")
-                        f.write(f"   *Note: This is measured in the same embedding space as mimicry, so correlation may be partly by construction.*\n\n")
-                    else:
-                        f.write(f"⚠️ **Train-Gen Embedding Similarity**: Unexpected positive correlation (r={r:.3f}, q={q:.4f})\n\n")
-                else:
-                    f.write(f"❓ **Train-Gen Embedding Similarity**: No significant relationship (r={r:.3f}, q={q:.4f})\n\n")
+            # Note about topic similarity
+            f.write(f"\n**Note**: Train-gen topic similarity is analyzed separately using independent TF-IDF metrics (see topic similarity analysis).\n\n")
         
         f.write(f"\n---\n\n")
         f.write(f"*Generated by `analyse_author_factors.py`*\n")
@@ -693,7 +596,7 @@ def create_visualizations(df: pd.DataFrame, output_dir: Path, full_run: int):
 def create_correlation_heatmap(df: pd.DataFrame, output_dir: Path, full_run: int):
     """Create an improved correlation heatmap with clear interpretation."""
     
-    # Define factor and performance columns
+    # Define factor and performance columns (only training properties and distinctiveness)
     factor_cols = [
         'mean_pairwise_dist', 
         'std_pairwise_dist', 
@@ -701,9 +604,6 @@ def create_correlation_heatmap(df: pd.DataFrame, output_dir: Path, full_run: int
         'nearest_neighbor_dist', 
         'mean_neighbor_dist', 
         'k_nearest_avg',
-        'mean_train_gen_emb_sim_simple',
-        'mean_train_gen_emb_sim_complex',
-        'mean_train_gen_emb_sim_avg'
     ]
     
     perf_cols = [
@@ -794,20 +694,9 @@ def main():
     print(f"Model: {args.model_key}")
     print(f"Full run: {args.full_run}\n")
     
-    # Load embeddings
-    print("Loading embeddings...")
+    # Load embeddings (only training - no need for generated embeddings)
+    print("Loading training embeddings...")
     training_embs = load_training_embeddings(args.model_key, base_path)
-    
-    # Load BOTH prompt variants for proper embedding similarity computation
-    print("Loading generated embeddings (simple prompt)...")
-    generated_embs_simple = load_generated_embeddings(
-        args.model_key, args.llm_key, "simple", args.full_run, base_path
-    )
-    
-    print("Loading generated embeddings (complex prompt)...")
-    generated_embs_complex = load_generated_embeddings(
-        args.model_key, args.llm_key, "complex", args.full_run, base_path
-    )
     
     # Load mimicry performance
     print("\nLoading mimicry performance...")
@@ -817,11 +706,9 @@ def main():
     print("\nComputing author factors...")
     author_factors = []
     
-    # Only process authors that have training + BOTH generated embeddings
-    common_authors = (set(training_embs.keys()) & 
-                     set(generated_embs_simple.keys()) & 
-                     set(generated_embs_complex.keys()))
-    print(f"Found {len(common_authors)} authors with training + both generated embeddings")
+    # Only process authors that appear in performance data
+    common_authors = set(training_embs.keys()) & set(perf_df['author_id'].values)
+    print(f"Found {len(common_authors)} authors with training embeddings and performance data")
     
     # Precompute centroids once for efficiency (only for common authors)
     print("Precomputing author centroids...")
@@ -836,39 +723,11 @@ def main():
         # Author distinctiveness (using precomputed centroids)
         distinctiveness = compute_author_distinctiveness(author_id, author_centroids)
         
-        # Train-gen embedding similarity for BOTH prompts
-        emb_sim_simple = compute_train_gen_emb_similarity(
-            training_embs[author_id], generated_embs_simple[author_id]
-        )
-        emb_sim_complex = compute_train_gen_emb_similarity(
-            training_embs[author_id], generated_embs_complex[author_id]
-        )
-        
-        # Rename keys to be prompt-specific
-        emb_sim_simple_renamed = {f"{k}_simple": v for k, v in emb_sim_simple.items()}
-        emb_sim_complex_renamed = {f"{k}_complex": v for k, v in emb_sim_complex.items()}
-        
-        # Compute average embedding similarity over ALL pairs (6 training × 4 generated = 24 pairs)
-        # This is more principled than averaging the per-prompt means
-        all_generated = np.vstack([generated_embs_simple[author_id], generated_embs_complex[author_id]])
-        emb_sim_avg_dict = compute_train_gen_emb_similarity(
-            training_embs[author_id], 
-            all_generated
-        )
-        emb_sim_avg = {
-            'mean_train_gen_emb_sim_avg': emb_sim_avg_dict['mean_train_gen_emb_sim'],
-            'max_train_gen_emb_sim_avg': emb_sim_avg_dict['max_train_gen_emb_sim'],
-            'min_train_gen_emb_sim_avg': emb_sim_avg_dict['min_train_gen_emb_sim']
-        }
-        
-        # Combine all metrics
+        # Combine all metrics (NO train-gen embedding similarity - analyzed separately with TF-IDF)
         factors = {
             'author_id': author_id,
             **tightness,
             **distinctiveness,
-            **emb_sim_simple_renamed,
-            **emb_sim_complex_renamed,
-            **emb_sim_avg
         }
         author_factors.append(factors)
     

@@ -574,10 +574,22 @@ def create_confusion_matrices(all_results: List[Dict], source_names: List[str],
     print("\nCreating confusion matrices...")
     
     n_methods = len(all_results)
-    fig, axes = plt.subplots(1, n_methods, figsize=(6*n_methods, 5))
     
+    # Arrange in grid: 2 rows × 3 columns (or 3×2 if less than 6 methods)
+    if n_methods <= 3:
+        nrows, ncols = 1, n_methods
+    elif n_methods <= 6:
+        nrows, ncols = 2, 3
+    else:
+        nrows, ncols = 3, 3
+    
+    fig, axes = plt.subplots(nrows, ncols, figsize=(8*ncols, 7*nrows))
+    
+    # Flatten axes array for easy indexing
     if n_methods == 1:
         axes = [axes]
+    else:
+        axes = axes.flatten()
     
     for ax, results in zip(axes, all_results):
         y_true = np.array(results['y_true'])
@@ -597,6 +609,10 @@ def create_confusion_matrices(all_results: List[Dict], source_names: List[str],
         
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=8)
         plt.setp(ax.get_yticklabels(), rotation=0, fontsize=8)
+    
+    # Hide unused subplots
+    for idx in range(n_methods, len(axes)):
+        axes[idx].axis('off')
     
     plt.tight_layout()
     cm_path = output_dir / f"confusion_matrices_comparison_fullrun{full_run}.png"
